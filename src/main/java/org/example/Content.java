@@ -8,22 +8,19 @@ import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Content extends JPanel implements KeyListener {
     private Player player;
     private Image background;
     private boolean rightPressed,leftPressed,upPressed,downPressed,spacePressed;
-    private  List<Bullet> bullets=new ArrayList<>();
-    private ArrayList<Meteor> meteors;
-    private ArrayList<Explosion> explosions = new ArrayList<>();
+    private List<Bullet> bullets;
+    private List<Meteor> meteors;
+    private List<Explosion> explosions;
     private static final int WINDOW_WIDTH = 1000;
     private static final int WINDOW_HEIGHT = 600;
     private static final long METEOR_SPAWN_DELAY = 3000;
     private long lastMeteorSpawnTime = 0;
-
-
-
-
 
 
     public Content(int x, int y, int width, int height) {
@@ -34,7 +31,9 @@ public class Content extends JPanel implements KeyListener {
         this.setFocusable(true);
         this.requestFocusInWindow();
         this.addKeyListener(this);
-        this.meteors = new ArrayList<>();
+        this.meteors = new CopyOnWriteArrayList<>();
+        this.bullets = new CopyOnWriteArrayList<>();
+        this.explosions = new CopyOnWriteArrayList<>();
         allDirections();
         bulletShoot();
         action();
