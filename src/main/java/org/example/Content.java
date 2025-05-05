@@ -21,6 +21,11 @@ public class Content extends JPanel implements KeyListener {
     private static final long METEOR_SPAWN_DELAY = 3000;
     private long lastMeteorSpawnTime = 0;
 
+
+
+
+
+
     public Content(int x, int y, int width, int height) {
         this.setBounds(x, y, width, height);
         player = new Player(width / 2, height / 2, 100, 100);
