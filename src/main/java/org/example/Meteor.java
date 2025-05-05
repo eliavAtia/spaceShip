@@ -24,7 +24,7 @@ public class Meteor {
         this.height = size;
         this.life = 3;
         try {
-            image = ImageIO.read(Objects.requireNonNull(getClass().getResource("/images/mmm.png")));
+            image = ImageIO.read(Objects.requireNonNull(getClass().getResource("/images/img.png")));
         } catch (IOException e) {
             e.printStackTrace();
         }
