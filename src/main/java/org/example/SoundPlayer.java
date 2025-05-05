@@ -6,6 +6,7 @@ import java.net.URL;
 
 public class SoundPlayer {
     private Clip clip;
+
     public SoundPlayer(String soundPath){
         try{
             URL url=getClass().getResource(soundPath);
@@ -16,6 +17,7 @@ public class SoundPlayer {
             e.printStackTrace();
         }
     }
+
     public void playSound(){
         if (clip!=null){
             if (clip.isRunning()){
