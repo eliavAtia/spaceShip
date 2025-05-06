@@ -7,13 +7,12 @@ import java.awt.event.KeyListener;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Content extends JPanel implements KeyListener {
     private Player player;
-    private final Image background;
+    private  Image background;
     private boolean rightPressed,leftPressed,upPressed,downPressed,spacePressed;
     private List<Bullet> bullets;
     private List<Meteor> meteors;
@@ -23,30 +22,33 @@ public class Content extends JPanel implements KeyListener {
     private static final long METEOR_SPAWN_DELAY = 1500;
     private long lastMeteorSpawnTime = 0;
     private boolean isGameOver;
-    private final Image heartFull;
-    private final Image heartEmpty;
-    private final Image gameOver;
-    private final SoundPlayer gameOverSound;
+    private Image heartFull;
+    private Image heartEmpty;
+    private Image gameOver;
+    private SoundPlayer gameOverSound;
+    private SoundPlayer trumpet;
 
 
+    private long gameOverTime;
     public Content(int x, int y, int width, int height) {
         this.setBounds(x, y, width, height);
         player = new Player(width / 2, height / 2, 100, 100);
-        ImageIcon icon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/images/space1.png")));
-        background = new ImageIcon(Objects.requireNonNull(getClass().getResource("/images/backgroundGif.gif"))).getImage();
-        heartFull=new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/minecraftFullHeart.png"))).getImage();
-        heartEmpty=new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/minecraftEmptyHeart.png"))).getImage();
-        gameOver=new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/gameOver.png"))).getImage();
+        ImageIcon icon = new ImageIcon(getClass().getResource("/images/space1.png"));
+        background = new ImageIcon(getClass().getResource("/images/backgroundGif.gif")).getImage();
+        heartFull=new ImageIcon(getClass().getResource("/Images/minecraftFullHeart.png")).getImage();
+        heartEmpty=new ImageIcon(getClass().getResource("/Images/minecraftEmptyHeart.png")).getImage();
+        gameOver=new ImageIcon(getClass().getResource("/Images/gameOver.png")).getImage();
         gameOverSound=new SoundPlayer("/Sounds/gameOver.wav");
+        trumpet=new SoundPlayer("/Sounds/sadTrumpet.wav");
         this.setFocusable(true);
         this.requestFocusInWindow();
         this.addKeyListener(this);
         this.meteors = new CopyOnWriteArrayList<>();
         this.bullets = new CopyOnWriteArrayList<>();
         this.explosions = new CopyOnWriteArrayList<>();
-        allDirections();
-        bulletShoot();
-        action();
+            allDirections();
+            bulletShoot();
+            action();
     }
 
     public void paintComponent(Graphics g) {
@@ -54,33 +56,33 @@ public class Content extends JPanel implements KeyListener {
         g.drawImage(background, 0, 0, getWidth(), getHeight(), this);
         if (!this.isGameOver) {
             this.player.paint(g);
-            for (Bullet b: bullets){
-                synchronized (bullets) {
-                    b.draw(g);
-                }
-            }
-            for (Explosion explosion : explosions) {
-                explosion.paint(g);
-            }
-            Graphics2D g2d = (Graphics2D) g;
-            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            for (Meteor meteor : meteors){
-                AffineTransform oldTransform = g2d.getTransform();
-                g2d.rotate(Math.toRadians(meteor.getRotationAngle()), meteor.getX(), meteor.getY());
-                meteor.paint(g2d);
-                g2d.setTransform(oldTransform);
-                meteor.rotate();
-            }
-            for (int i = 0; i < player.getMaxHp(); i++) {
-                if (player.getHp()>i){
-                    g.drawImage(heartFull,20+i*40,20,32,32,this);
-                }
-                else {
-                    g.drawImage(heartEmpty,20+i*40,20,32,32,this);
-                }
+        }
+        for (Bullet b: bullets){
+            synchronized (bullets) {
+                b.draw(g);
             }
         }
-        else {
+        for (Explosion explosion : explosions) {
+            explosion.paint(g);
+        }
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        for (Meteor meteor : meteors){
+            AffineTransform oldTransform = g2d.getTransform();
+            g2d.rotate(Math.toRadians(meteor.getRotationAngle()), meteor.getX(), meteor.getY());
+            meteor.paint(g2d);
+            g2d.setTransform(oldTransform);
+            meteor.rotate();
+        }
+        for (int i = 0; i < player.getMaxHp(); i++) {
+            if (player.getHp()>i){
+                g.drawImage(heartFull,20+i*40,20,32,32,this);
+            }
+            else {
+                g.drawImage(heartEmpty,20+i*40,20,32,32,this);
+            }
+        }
+        if (isGameOver){
             g.drawImage(gameOver,this.getWidth()/2-250,this.getHeight()/2-250,500,500,this);
 
         }
@@ -271,7 +273,8 @@ public class Content extends JPanel implements KeyListener {
         bullets.removeAll(ballsToRemove);
     }
 
-    private void checkMeteorPlayerCollision(){
+    private void checkMeteorPlayerCollison(){
+        ArrayList<Meteor> meteorsToRemove = new ArrayList<>();
         Rectangle playerRectangle=new Rectangle(
                 player.getX()+20,
                 player.getY()+20,
@@ -285,11 +288,7 @@ public class Content extends JPanel implements KeyListener {
                     meteor.getWidth(),
                     meteor.getHeight()
             );
-            if(player.isShieldOn()){
-                continue;
-            }
             if (meteorRectangle.intersects(playerRectangle)){
-                player.setShieldOn(true);
                 player.setHp(player.getHp()-1);
                 explosions.add(new Explosion(meteor.getX(),meteor.getY()));
                 meteors.remove(meteor);
@@ -297,19 +296,9 @@ public class Content extends JPanel implements KeyListener {
             if (player.getHp()<=0){
                 this.isGameOver=true;
                 gameOverSound.playSound();
+                gameOverTime=System.currentTimeMillis();
             }
-            new Thread(() -> {
-                try {
-                    if(player.isShieldOn()){
-                        Thread.sleep(3000);
-                        player.setShieldOn(false);
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }).start();
         }
-
     }
 
     private synchronized void action() {
@@ -317,7 +306,7 @@ public class Content extends JPanel implements KeyListener {
             while (!isGameOver) {
                 updateMeteors();
                 checkCollisionMeteorsBullets();
-                checkMeteorPlayerCollision();
+                checkMeteorPlayerCollison();
                 repaint();
                 try {
                     Thread.sleep(10);
