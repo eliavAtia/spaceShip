@@ -85,11 +85,7 @@ public class Content extends JPanel implements KeyListener {
         if (isGameOver){
             g.drawImage(gameOver,this.getWidth()/2-250,this.getHeight()/2-250,500,500,this);
             gameOverSound.playSound();
-            long now=System.currentTimeMillis();
-            if (now-gameOverTime>1500){
-                trumpet.playSound();
-            }
-
+            trumpet.playSound();
         }
     }
 
@@ -164,7 +160,7 @@ public class Content extends JPanel implements KeyListener {
                 player.playerMove(vertical,horizontal);
                 repaint();
                 try {
-                    Thread.sleep(18);
+                    Thread.sleep(13);
                 }catch (InterruptedException e){
                     e.printStackTrace();
                 }
