@@ -6,6 +6,9 @@ import java.awt.*;
 public class Boss1 {
     private int x, y, width, height, hp, maxHp;
     private Image bossImage;
+    private int speed = 1; // מהירות הבוס
+    private int direction = 1;
+    private int WINDOW_WIDTH;
 
     public Boss1(int x, int y, int width, int height) {
         this.x = x;
@@ -14,15 +17,14 @@ public class Boss1 {
         this.height = height;
         this.maxHp = 100;
         this.hp = maxHp;
-        this.bossImage = new ImageIcon(getClass().getResource("/Images/boss1.png")).getImage();
+        this.bossImage = new ImageIcon(getClass().getResource("/Images/Boss1.png")).getImage();
     }
 
     public void draw(Graphics g) {
         g.drawImage(bossImage, x, y, width, height, null);
-        // פס חיים
+        g.setColor(Color.BLACK);
+        g.fillRect(x, y -20, width, 10);
         g.setColor(Color.RED);
-        g.fillRect(x, y - 20, width, 10);
-        g.setColor(Color.GREEN);
         g.fillRect(x, y - 20, (int)((double)hp / maxHp * width), 10);
     }
 
@@ -31,9 +33,12 @@ public class Boss1 {
     }
 
     public void move() {
-        x += 2;
-        if (x + width > 1000 || x < 0) {
-            x -= 4;
+        x += speed * direction;
+        if (x + width >= 1420) {
+            direction = -1;
+        }
+        else if (x <= 0) {
+            direction = 1;
         }
     }
 

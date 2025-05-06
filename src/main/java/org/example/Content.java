@@ -21,6 +21,8 @@ public class Content extends JPanel implements KeyListener {
     private static final int WINDOW_HEIGHT = 600;
     private static final long METEOR_SPAWN_DELAY = 1500;
     private long lastMeteorSpawnTime = 0;
+    private Boss1 boss1;
+    private boolean bossActive = false;
     private boolean isGameOver;
     private Image heartFull;
     private Image heartEmpty;
@@ -33,6 +35,8 @@ public class Content extends JPanel implements KeyListener {
     public Content(int x, int y, int width, int height) {
         this.setBounds(x, y, width, height);
         player = new Player(width / 2, height / 2, 100, 100);
+        boss1 = new Boss1(400, 50, 350, 170);
+        bossActive = true;
         ImageIcon icon = new ImageIcon(getClass().getResource("/images/space1.png"));
         background = new ImageIcon(getClass().getResource("/images/backgroundGif.gif")).getImage();
         heartFull=new ImageIcon(getClass().getResource("/Images/minecraftFullHeart.png")).getImage();
@@ -82,6 +86,9 @@ public class Content extends JPanel implements KeyListener {
                 g.drawImage(heartEmpty,20+i*40,20,32,32,this);
             }
         }
+//        if (bossActive && boss1 != null) {
+//            boss1.draw(g);
+//        }
         if (isGameOver){
             g.drawImage(gameOver,this.getWidth()/2-250,this.getHeight()/2-250,500,500,this);
 
