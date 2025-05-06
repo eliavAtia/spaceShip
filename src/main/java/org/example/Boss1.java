@@ -2,6 +2,8 @@ package org.example;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Boss1 {
     private int x, y, width, height, hp, maxHp;
@@ -15,7 +17,7 @@ public class Boss1 {
         this.y = y;
         this.width = width;
         this.height = height;
-        this.maxHp = 100;
+        this.maxHp = 150;
         this.hp = maxHp;
         this.bossImage = new ImageIcon(getClass().getResource("/Images/Boss1.png")).getImage();
     }
@@ -29,7 +31,7 @@ public class Boss1 {
     }
 
     public Rectangle getBounds() {
-        return new Rectangle(x, y, width, height);
+        return new Rectangle(x, y-height/2, width, height);
     }
 
     public void move() {

@@ -19,7 +19,7 @@ public class Bullet {
     }
 
     public void draw(Graphics g){
-        g.drawImage(this.image,this.x,this.y,null);
+        g.drawImage(this.image,this.x,this.y,width,height,null);
     }
 
     public int getHeight() {

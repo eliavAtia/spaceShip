@@ -86,13 +86,17 @@ public class Content extends JPanel implements KeyListener {
                 g.drawImage(heartEmpty,20+i*40,20,32,32,this);
             }
         }
-//        if (bossActive && boss1 != null) {
-//            boss1.draw(g);
-//        }
+        if (bossActive && boss1 != null) {
+            boss1.draw(g);
+        }
+        if (bossActive && boss1 != null) {
+            boss1.move();
+        }
         if (isGameOver){
             g.drawImage(gameOver,this.getWidth()/2-250,this.getHeight()/2-250,500,500,this);
 
         }
+
     }
 
     @Override
@@ -295,7 +299,11 @@ public class Content extends JPanel implements KeyListener {
                     meteor.getWidth(),
                     meteor.getHeight()
             );
+            if (player.isShieldOn()){
+                continue;
+            }
             if (meteorRectangle.intersects(playerRectangle)){
+                player.setShieldOn(true);
                 player.setHp(player.getHp()-1);
                 explosions.add(new Explosion(meteor.getX(),meteor.getY()));
                 meteors.remove(meteor);
@@ -305,6 +313,16 @@ public class Content extends JPanel implements KeyListener {
                 gameOverSound.playSound();
                 gameOverTime=System.currentTimeMillis();
             }
+            new Thread(()->{
+                try{
+                    if (player.isShieldOn()){
+                        Thread.sleep(3000);
+                        player.setShieldOn(false);
+                    }
+                }catch (InterruptedException e){
+                    e.printStackTrace();
+                }
+            }).start();
         }
     }
 
@@ -314,6 +332,7 @@ public class Content extends JPanel implements KeyListener {
                 updateMeteors();
                 checkCollisionMeteorsBullets();
                 checkMeteorPlayerCollison();
+                checkBulletBossCollision();
                 repaint();
                 try {
                     Thread.sleep(10);
@@ -322,5 +341,24 @@ public class Content extends JPanel implements KeyListener {
                 }
             }
         }).start();
+    }
+    private void checkBulletBossCollision() {
+        if (!bossActive || boss1 == null) return;
+        Rectangle bossRect = boss1.getBounds();
+        List<Bullet> bulletsToRemove = new ArrayList<>();
+
+        for (Bullet b : bullets) {
+            Rectangle bulletRect = new Rectangle(b.getX(), b.getY(), b.getWidth(), b.getHeight());
+
+            if (bossRect.intersects(bulletRect)) {
+                boss1.hit();
+                bulletsToRemove.add(b);
+            }
+        }
+        bullets.removeAll(bulletsToRemove);
+        if (boss1.getHp() <= 0) {
+            bossActive = false;
+            explosions.add(new Explosion(boss1.getX(), boss1.getY()));
+        }
     }
 }

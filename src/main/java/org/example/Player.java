@@ -94,13 +94,13 @@ public class Player  {
 
     public Bullet shootRight(){
         lasers.playSound();
-        return new Bullet(x+width -45,y,12,20);
+        return new Bullet(x+width -45,y,40,60);
 
     }
 
     public Bullet shootLeft(){
         lasers.playSound();
-        return new Bullet(x+8,y,12,20);
+        return new Bullet(x+8,y,40,60);
     }
 
     public int getHp(){
