@@ -2,6 +2,7 @@ package org.example;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Objects;
 
 public class Player  {
     private int x;
@@ -11,8 +12,9 @@ public class Player  {
     private Image image1,image2,image3;
     private boolean rightPressed,leftPressed,upPressed,downPressed,spacePressed;
     private int hp;
-    private final int maxHp=5;
     SoundPlayer lasers=new SoundPlayer("/Sounds/laserSound.wav");
+    private boolean shieldOn;
+    private boolean shouldDrawPlayerImage = true;
 
 
     public Player(int x,int y,int width,int height){
@@ -20,25 +22,39 @@ public class Player  {
         this.y=y;
         this.width=width;
         this.height=height;
-        this.image1=new ImageIcon(getClass().getResource("/Images/spaceShip.png")).getImage();
-        this.image2=new ImageIcon(getClass().getResource("/Images/sSpaceShip.png")).getImage();
-        this.image3=new ImageIcon(getClass().getResource("/Images/bSpaceShip.png")).getImage();
+        this.image1=new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/spaceShip.png"))).getImage();
+        this.image2=new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/sSpaceShip.png"))).getImage();
+        this.image3=new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/bSpaceShip.png"))).getImage();
         this.hp=5;
+        this.shieldOn = false;
     }
-
 
     public void paint(Graphics graphics){
-        if (upPressed){
-            graphics.drawImage(this.image3,this.x,this.y,this.width,this.height,null);
-        } else if (downPressed) {
-            graphics.drawImage(this.image2,this.x,this.y,this.width,this.height,null);
-        }
-        else {
-            graphics.drawImage(this.image1,this.x,this.y,this.width,this.height,null);
+        if(shouldDrawPlayerImage){
+            if (upPressed){
+                graphics.drawImage(this.image3,this.x,this.y,this.width,this.height,null);
+            } else if (downPressed) {
+                graphics.drawImage(this.image2,this.x,this.y,this.width,this.height,null);
+            }
+            else {
+                graphics.drawImage(this.image1,this.x,this.y,this.width,this.height,null);
+            }
         }
     }
 
-
+    public void startFlashingEffect() {
+        new Thread(() -> {
+            while (shieldOn) {
+                shouldDrawPlayerImage = !shouldDrawPlayerImage;
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            shouldDrawPlayerImage = true;
+        }).start();
+    }
     public void playerMove(int vertical,int horizontal){
         x+=horizontal;
         y+=vertical;
@@ -86,14 +102,30 @@ public class Player  {
         lasers.playSound();
         return new Bullet(x+8,y,12,20);
     }
+
     public int getHp(){
         return hp;
     }
+
     public void setHp(int hp){
         this.hp=hp;
     }
 
     public int getMaxHp() {
+        int maxHp = 5;
         return maxHp;
+    }
+
+    public boolean isShieldOn() {
+        return shieldOn;
+    }
+
+    public void setShieldOn(boolean shieldOn) {
+        this.shieldOn = shieldOn;
+        if (shieldOn) {
+            startFlashingEffect();
+        } else {
+            shouldDrawPlayerImage = true;
+        }
     }
 }
