@@ -12,7 +12,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Content extends JPanel implements KeyListener {
     private Player player;
-    private Image background;
+    private  Image background;
     private boolean rightPressed,leftPressed,upPressed,downPressed,spacePressed;
     private List<Bullet> bullets;
     private List<Meteor> meteors;
@@ -34,7 +34,7 @@ public class Content extends JPanel implements KeyListener {
         this.setBounds(x, y, width, height);
         player = new Player(width / 2, height / 2, 100, 100);
         ImageIcon icon = new ImageIcon(getClass().getResource("/images/space1.png"));
-        this.background = icon.getImage();
+        background = new ImageIcon(getClass().getResource("/images/backgroundGif.gif")).getImage();
         heartFull=new ImageIcon(getClass().getResource("/Images/minecraftFullHeart.png")).getImage();
         heartEmpty=new ImageIcon(getClass().getResource("/Images/minecraftEmptyHeart.png")).getImage();
         gameOver=new ImageIcon(getClass().getResource("/Images/gameOver.png")).getImage();
@@ -84,8 +84,7 @@ public class Content extends JPanel implements KeyListener {
         }
         if (isGameOver){
             g.drawImage(gameOver,this.getWidth()/2-250,this.getHeight()/2-250,500,500,this);
-            gameOverSound.playSound();
-            trumpet.playSound();
+
         }
     }
 
@@ -296,6 +295,7 @@ public class Content extends JPanel implements KeyListener {
             }
             if (player.getHp()<=0){
                 this.isGameOver=true;
+                gameOverSound.playSound();
                 gameOverTime=System.currentTimeMillis();
             }
         }
