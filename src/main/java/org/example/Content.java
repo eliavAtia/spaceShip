@@ -217,13 +217,13 @@ public class Content extends JPanel implements KeyListener {
 
     private void createNewMeteor(){
         Random random = new Random();
-        int[] startPoint = new int[9];
+        int[] startPoint = new int[this.getWidth()/100 -1];
         int point = 85;
         for (int i = 0; i < startPoint.length; i++) {
             startPoint[i] = point;
             point+=100;
         }
-        int x = startPoint[random.nextInt(9)];
+        int x = startPoint[random.nextInt(startPoint.length)];
         int y = -50;
         int size = random.nextInt(90,101);
         Meteor meteor = new Meteor(x,y,size);
