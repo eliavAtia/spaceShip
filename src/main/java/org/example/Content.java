@@ -19,32 +19,48 @@ public class Content extends JPanel implements KeyListener {
     private List<Explosion> explosions;
     private static final int WINDOW_WIDTH = 1000;
     private static final int WINDOW_HEIGHT = 600;
-    private static final long METEOR_SPAWN_DELAY = 3000;
+    private static final long METEOR_SPAWN_DELAY = 1500;
     private long lastMeteorSpawnTime = 0;
+    private boolean isGameOver;
+    private Image heartFull;
+    private Image heartEmpty;
+    private Image gameOver;
+    private SoundPlayer gameOverSound;
+    private SoundPlayer trumpet;
 
 
+    private long gameOverTime;
     public Content(int x, int y, int width, int height) {
         this.setBounds(x, y, width, height);
         player = new Player(width / 2, height / 2, 100, 100);
         ImageIcon icon = new ImageIcon(getClass().getResource("/images/space1.png"));
         this.background = icon.getImage();
+        heartFull=new ImageIcon(getClass().getResource("/Images/minecraftFullHeart.png")).getImage();
+        heartEmpty=new ImageIcon(getClass().getResource("/Images/minecraftEmptyHeart.png")).getImage();
+        gameOver=new ImageIcon(getClass().getResource("/Images/gameOver.png")).getImage();
+        gameOverSound=new SoundPlayer("/Sounds/gameOver.wav");
+        trumpet=new SoundPlayer("/Sounds/sadTrumpet.wav");
         this.setFocusable(true);
         this.requestFocusInWindow();
         this.addKeyListener(this);
         this.meteors = new CopyOnWriteArrayList<>();
         this.bullets = new CopyOnWriteArrayList<>();
         this.explosions = new CopyOnWriteArrayList<>();
-        allDirections();
-        bulletShoot();
-        action();
+            allDirections();
+            bulletShoot();
+            action();
     }
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         g.drawImage(background, 0, 0, getWidth(), getHeight(), this);
-        this.player.paint(g);
+        if (!this.isGameOver) {
+            this.player.paint(g);
+        }
         for (Bullet b: bullets){
-            b.draw(g);
+            synchronized (bullets) {
+                b.draw(g);
+            }
         }
         for (Explosion explosion : explosions) {
             explosion.paint(g);
@@ -57,6 +73,23 @@ public class Content extends JPanel implements KeyListener {
             meteor.paint(g2d);
             g2d.setTransform(oldTransform);
             meteor.rotate();
+        }
+        for (int i = 0; i < player.getMaxHp(); i++) {
+            if (player.getHp()>i){
+                g.drawImage(heartFull,20+i*40,20,32,32,this);
+            }
+            else {
+                g.drawImage(heartEmpty,20+i*40,20,32,32,this);
+            }
+        }
+        if (isGameOver){
+            g.drawImage(gameOver,this.getWidth()/2-250,this.getHeight()/2-250,500,500,this);
+            gameOverSound.playSound();
+            long now=System.currentTimeMillis();
+            if (now-gameOverTime>1500){
+                trumpet.playSound();
+            }
+
         }
     }
 
@@ -113,7 +146,7 @@ public class Content extends JPanel implements KeyListener {
 
     public synchronized void allDirections(){
         new Thread(()->{
-            while (true){
+            while (!isGameOver){
                 int vertical=0;
                 int horizontal=0;
                 if (rightPressed&&this.player.getX()<=getWidth()- player.getWidth()){
@@ -143,7 +176,7 @@ public class Content extends JPanel implements KeyListener {
         new Thread(() -> {
             long lastShot = System.currentTimeMillis();
             final int SHOOT_DELAY = 300;
-            while (true) {
+            while (!isGameOver) {
                 long now = System.currentTimeMillis();
                 if (spacePressed &&( now - lastShot > SHOOT_DELAY)) {
                     synchronized (bullets) {
@@ -160,7 +193,7 @@ public class Content extends JPanel implements KeyListener {
         }).start();
         new Thread(() -> {
             final int BULLET_SPEED = 10;
-            while (true) {
+            while (!isGameOver) {
                   synchronized (bullets){
                       for (Bullet b : bullets) {
                           b.move();
@@ -233,27 +266,58 @@ public class Content extends JPanel implements KeyListener {
                     explosions.add(new Explosion(meteors.get(j).getX(), meteors.get(j).getY()));
                 }
             }
+            if (bullets.get(i).getY()+bullets.get(i).getHeight()<0){
+                ballsToRemove.add(bullets.get(i));
+            }
+
         }
+        bullets.removeIf(b -> b.getY() + b.getHeight() < 0);
         explosions.removeIf(Explosion::isFinished);
         explosions.forEach(Explosion::update);
         meteors.removeAll(meteorsToRemove);
         bullets.removeAll(ballsToRemove);
-        bullets.removeIf(b -> b.getY() + b.getHeight() < 0);
+    }
+
+    private void checkMeteorPlayerCollison(){
+        ArrayList<Meteor> meteorsToRemove = new ArrayList<>();
+        Rectangle playerRectangle=new Rectangle(
+                player.getX()+20,
+                player.getY()+20,
+                player.getWidth()-40,
+                player.getHeight()-50
+        );
+        for (Meteor meteor:meteors) {
+            Rectangle meteorRectangle = new Rectangle(
+                    meteor.getX() - meteor.getWidth()/2,
+                    meteor.getY() - meteor.getHeight()/2,
+                    meteor.getWidth(),
+                    meteor.getHeight()
+            );
+            if (meteorRectangle.intersects(playerRectangle)){
+                player.setHp(player.getHp()-1);
+                explosions.add(new Explosion(meteor.getX(),meteor.getY()));
+                meteors.remove(meteor);
+            }
+            if (player.getHp()<=0){
+                this.isGameOver=true;
+                gameOverTime=System.currentTimeMillis();
+            }
+        }
     }
 
     private synchronized void action() {
         new Thread(() -> {
-            while (true) {
+            while (!isGameOver) {
                 updateMeteors();
                 checkCollisionMeteorsBullets();
+                checkMeteorPlayerCollison();
                 repaint();
                 try {
-                    Thread.sleep(16);
+                    Thread.sleep(10);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             }
         }).start();
     }
-
 }

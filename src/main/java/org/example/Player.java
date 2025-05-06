@@ -10,6 +10,8 @@ public class Player  {
     private int height;
     private Image image1,image2,image3;
     private boolean rightPressed,leftPressed,upPressed,downPressed,spacePressed;
+    private int hp;
+    private final int maxHp=5;
     SoundPlayer lasers=new SoundPlayer("/Sounds/laserSound.wav");
 
 
@@ -21,6 +23,7 @@ public class Player  {
         this.image1=new ImageIcon(getClass().getResource("/Images/spaceShip.png")).getImage();
         this.image2=new ImageIcon(getClass().getResource("/Images/sSpaceShip.png")).getImage();
         this.image3=new ImageIcon(getClass().getResource("/Images/bSpaceShip.png")).getImage();
+        this.hp=5;
     }
 
 
@@ -82,5 +85,15 @@ public class Player  {
     public Bullet shootLeft(){
         lasers.playSound();
         return new Bullet(x+8,y,12,20);
+    }
+    public int getHp(){
+        return hp;
+    }
+    public void setHp(int hp){
+        this.hp=hp;
+    }
+
+    public int getMaxHp() {
+        return maxHp;
     }
 }
