@@ -22,22 +22,21 @@ public class Content extends JPanel implements KeyListener {
     private static final long METEOR_SPAWN_DELAY = 1500;
     private long lastMeteorSpawnTime = 0;
     private Boss1 boss1;
-    private boolean bossActive = false;
+    private boolean bossActive;
     private boolean isGameOver;
     private Image heartFull;
     private Image heartEmpty;
     private Image gameOver;
     private SoundPlayer gameOverSound;
     private SoundPlayer trumpet;
-    ArrayList<EnemySpaceShip> enemySpaceShips = new ArrayList<>();
+    private int score;
+    private JLabel scoreLabel;
+    List<EnemySpaceShip> enemySpaceShips;
 
-
-    private long gameOverTime;
     public Content(int x, int y, int width, int height) {
         this.setBounds(x, y, width, height);
         player = new Player(width / 2, height / 2, 100, 100);
         boss1 = new Boss1(400, 50, 350, 170);
-        bossActive = true;
         ImageIcon icon = new ImageIcon(getClass().getResource("/images/space1.png"));
         background = new ImageIcon(getClass().getResource("/images/backgroundGif.gif")).getImage();
         heartFull=new ImageIcon(getClass().getResource("/Images/minecraftFullHeart.png")).getImage();
@@ -51,15 +50,14 @@ public class Content extends JPanel implements KeyListener {
         this.meteors = new CopyOnWriteArrayList<>();
         this.bullets = new CopyOnWriteArrayList<>();
         this.explosions = new CopyOnWriteArrayList<>();
-            allDirections();
-            bulletShoot();
-            action();
-        for (int i = 0; i < 1; i++) {
-            enemySpaceShips.add(new EnemySpaceShip(300 + i * 300, -20));
-        }
-
-        enemySpaceShipMove();
-        enemySpaceShipSpawner();
+        this.enemySpaceShips=new CopyOnWriteArrayList<>();
+        this.score=0;
+        scoreLabel=new JLabel("Score: "+score);
+        scoreLabel.setFont(new Font("Arial",Font.PLAIN,24));
+        scoreLabel.setForeground(Color.WHITE);
+        scoreLabel.setBounds(getWidth(),20,200,30);
+        this.add(scoreLabel);
+        gameCourse();
     }
 
     public void paintComponent(Graphics g) {
@@ -106,9 +104,8 @@ public class Content extends JPanel implements KeyListener {
         for (EnemySpaceShip enemySpaceShip : enemySpaceShips) {
             enemySpaceShip.paint(g);
         }
-
-
-
+        scoreLabel.setText("Score:" +score);
+        this.repaint();
     }
 
     @Override
@@ -280,6 +277,7 @@ public class Content extends JPanel implements KeyListener {
                     continue OuterLoop;
                 }
                 if(meteors.get(j).getLife()<=0){
+                    score+=100;
                     meteorsToRemove.add(meteors.get(j));
                     explosions.add(new Explosion(meteors.get(j).getX(), meteors.get(j).getY()));
                 }
@@ -323,7 +321,6 @@ public class Content extends JPanel implements KeyListener {
             if (player.getHp()<=0){
                 this.isGameOver=true;
                 gameOverSound.playSound();
-                gameOverTime=System.currentTimeMillis();
             }
             new Thread(()->{
                 try{
@@ -354,6 +351,7 @@ public class Content extends JPanel implements KeyListener {
             }
         }).start();
     }
+
     private void checkBulletBossCollision() {
         if (!bossActive || boss1 == null) return;
         Rectangle bossRect = boss1.getBounds();
@@ -418,4 +416,31 @@ public class Content extends JPanel implements KeyListener {
         }).start();
     }
 
+
+    private void gameCourse(){
+        allDirections();
+        bulletShoot();
+        action();
+        new Thread(()-> {
+            while (!isGameOver) {
+                if (score > 1000) {
+                    enemySpaceShipMove();
+                    enemySpaceShipSpawner();
+                }
+                if (score > 2000) {
+                    bossActive = true;
+                }
+                score += 10;
+                scoreLabel.setText("Score:" + score);
+                try {
+                    Thread.sleep(500);
+                }catch (InterruptedException e){
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+    private void enemySpaceShipsActions(){
+
+    }
 }
