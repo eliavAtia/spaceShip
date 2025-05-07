@@ -422,6 +422,7 @@ public class Content extends JPanel implements KeyListener {
         bulletShoot();
         action();
         new Thread(()-> {
+
             while (!isGameOver) {
                 if (score > 1000) {
                     enemySpaceShipMove();
