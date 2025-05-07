@@ -6,7 +6,7 @@ import java.awt.*;
 public class Boss extends  Mob {
     private int speed = 1; // מהירות הבוס
     private int direction = 1;
-    private int maxHp = 150;
+    private int maxHp = 30;
     private boolean active;
 
     public Boss(int x, int y, int width, int height) {

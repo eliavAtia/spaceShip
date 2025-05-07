@@ -30,6 +30,10 @@ public class Content extends JPanel implements KeyListener {
     private Image heartFull;
     private Image heartEmpty;
     private JLabel scoreLabel;
+    private long lastEnemySpawnTime = 0;
+    private long lastBossSpawnTime = 0;
+    private static final long ENEMY_RESPAWN_INTERVAL = 5000;
+    private static final long BOSS_TRIGGER_SCORE = 5000;
 
     public Content(int x, int y, int width, int height) {
         this.setBounds(x, y, width, height);
@@ -266,8 +270,6 @@ public class Content extends JPanel implements KeyListener {
             }
 
         }
-        explosions.removeIf(Explosion::isFinished);
-        explosions.forEach(Explosion::update);
         bullets.removeAll(bulletsToRemove);
         return mobsToRemove;
     }
@@ -320,6 +322,7 @@ public class Content extends JPanel implements KeyListener {
                 updateMeteors();
                 updateBullets();
                 updateEnemySpaceShips();
+                updateExplosions();
                 meteors.removeAll(checkBulletsCollision(new ArrayList<Mob>(meteors)));
                 meteors.removeAll(checkPlayerCollision(new ArrayList<Mob>(meteors)));
                 enemySpaceShips.removeAll(checkBulletsCollision(new ArrayList<Mob>(enemySpaceShips)));
@@ -354,9 +357,11 @@ public class Content extends JPanel implements KeyListener {
             }
         }
         bullets.removeAll(bulletsToRemove);
-        if (bosses[index].getLife() <= 0) {
+        if (bosses[index].getLife() <= 0) {;
+            if (bosses[index].isActive()) {
+                explosions.add(new Explosion(bosses[index].getX(), bosses[index].getY()));
+            }
             bosses[index].setActive(false);
-            explosions.add(new Explosion(bosses[index].getX(), bosses[index].getY()));
         }
     }
 
@@ -382,24 +387,19 @@ public class Content extends JPanel implements KeyListener {
     private void gameCourse(){
         allDirections();
         action();
+        infiniteScoreAdd();
         final int[] enemyRespawn = {2000};
         new Thread(()-> {
             while (!isGameOver) {
-                if (score > enemyRespawn[0]) {
+                long now = System.currentTimeMillis();
+                if (score > enemyRespawn[0] &&now-lastEnemySpawnTime>=ENEMY_RESPAWN_INTERVAL) {
                     enemySpaceShips.add(new EnemySpaceShip(getWidth()/2,-15));
-                    try {
-                        Thread.sleep(5000);
-                    }catch (InterruptedException e){
-                        e.printStackTrace();
-                    }
-                    enemySpaceShips.add(new EnemySpaceShip(getWidth()/2,-15));
+                    lastEnemySpawnTime=0;
                     enemyRespawn[0] +=2000;
-                }
-                if (score > 5000) {
+                    }
+                if (score > 2000&& !bosses[0].isActive()&&bosses[0].getLife()>0) {
                     bosses[0].setActive(true);
                 }
-                score += 1;
-                scoreLabel.setText("Score:" + score);
                 try {
                     Thread.sleep(60);
                 }catch (InterruptedException e){
@@ -408,7 +408,21 @@ public class Content extends JPanel implements KeyListener {
             }
         }).start();
     }
-    private void enemiesAction(){
+    private void infiniteScoreAdd(){
+        new Thread(()->{
+            while (!isGameOver) {
+                score++;
+                try {
+                    Thread.sleep(60);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+    private void updateExplosions(){
+        explosions.removeIf(Explosion::isFinished);
+        explosions.forEach(Explosion::update);
 
     }
 }
