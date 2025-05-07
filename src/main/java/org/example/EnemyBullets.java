@@ -2,76 +2,41 @@ package org.example;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Objects;
 
 
-public class EnemyBullets {
-    private int x;
-    private int y;
-    private int width;
-    private int height;
-    private Image image;
-
+public class EnemyBullets extends Mob {
 
     public EnemyBullets(int x, int y) {
-        this.x = x;
-        this.y = y;
-        this.width = 60;
-        this.height = 60;
+        setX(x);
+        setY(y);
+        setWidth(40);
+        setHeight(40);
+        setLife(1);
         try {
-            ImageIcon imageIcon = new ImageIcon(getClass().getResource("/cow.png"));
-            this.image = imageIcon.getImage();
+            ImageIcon imageIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/cow.png")));
+            setImage(imageIcon.getImage());
         } catch (Exception e) {
             System.out.println("שגיאה בטעינת התמונה: " + e.getMessage());
-            this.image = null;
+            setImage(null);
         }
     }
 
     public void paint(Graphics graphics) {
-        if (this.image != null) {
-            graphics.drawImage(this.image, this.x, this.y, this.width, this.height, null);
+        if (getImage() != null) {
+            graphics.drawImage(getImage(), getX(), getY(), getWidth(), getHeight(), null);
         } else {
             graphics.setColor(Color.RED);
-            graphics.fillRect(this.x, this.y, this.width, this.height);
+            graphics.fillRect(getX(), getY(), getWidth(), getHeight());
             graphics.setColor(Color.BLACK);
-            graphics.drawString("תמונה חסרה", this.x + 10, this.y + this.height / 2);
+            graphics.drawString("תמונה חסרה", getX() + 10, getY() + getHeight() / 2);
         }
     }
 
     public void moveDown(){
-        this.y+=8;
+        setY(getY()+8);
     }
 
-    public int getX() {
-        return x;
-    }
-
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public void setY(int y) {
-        this.y = y;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
-    }
 }
 
 

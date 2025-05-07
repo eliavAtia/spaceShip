@@ -3,42 +3,32 @@ package org.example;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Objects;
 
-public class EnemySpaceShip {
-    private int x;
-    private int y;
-    private int width;
-    private int height;
-    private Image image;
+public class EnemySpaceShip extends Mob {
     ArrayList<EnemyBullets> enemyBullets = new ArrayList<>();
     private long lastShotTime = 0;
-    private final long shotCooldown = 750;
-
+    private static final long SHOOT_SPAWN_DELAY = 1500;
+    boolean movingRight = true;
 
 
     public EnemySpaceShip(int x, int y){
-        this.x = x;
-        this.y = y;
-        this.width = 200;
-        this.height = 175;
+        setX(x);
+        setY(y);
+        setHeight(150);
+        setWidth(150);
+        setLife(5);
         try {
-            ImageIcon imageIcon = new ImageIcon(getClass().getResource("/Images/Enemy.png"));
-            this.image = imageIcon.getImage();
+            ImageIcon imageIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/Enemy.png")));
+            setImage(imageIcon.getImage());
         } catch (Exception e) {
             System.out.println("שגיאה בטעינת התמונה: " + e.getMessage());
-            this.image = null;
+            setImage(null);
         }
     }
 
-    public void shoot(){
+    public void updateBullets(){
         long currentTime = System.currentTimeMillis();
-        if (this.y > 100 && currentTime - lastShotTime >= shotCooldown){
-            enemyBullets.add(new EnemyBullets(this.x + this.width/3 , this.y+ this.height/2));
-            lastShotTime = currentTime;
-        }
-    }
-
-    public void bulletsMove(){
         ArrayList<EnemyBullets> toRemove = new ArrayList<>();
         for (EnemyBullets enemyBullet : enemyBullets){
             enemyBullet.moveDown();
@@ -47,16 +37,20 @@ public class EnemySpaceShip {
             }
         }
         enemyBullets.removeAll(toRemove);
+        if (getY() > 100 && currentTime - lastShotTime >= SHOOT_SPAWN_DELAY){
+            enemyBullets.add(new EnemyBullets(getX() + getWidth()/3 , getY()+ getHeight()/2));
+            lastShotTime = currentTime;
+        }
     }
 
     public void paint(Graphics graphics){
-        if (this.image != null) {
-            graphics.drawImage(this.image, this.x, this.y, this.width, this.height, null);
+        if (getImage() != null) {
+            graphics.drawImage(getImage(), getX(), getY(), getWidth(), getHeight(), null);
         } else {
             graphics.setColor(Color.RED);
-            graphics.fillRect(this.x, this.y, this.width, this.height);
+            graphics.fillRect(getX(), getY(), getWidth(), getHeight());
             graphics.setColor(Color.BLACK);
-            graphics.drawString("תמונה חסרה", this.x + 10, this.y + this.height / 2);
+            graphics.drawString("תמונה חסרה", getX() + 10, getY() + getHeight() / 2);
         }
         for (EnemyBullets enemyBullet : enemyBullets){
             enemyBullet.paint(graphics);
@@ -65,47 +59,31 @@ public class EnemySpaceShip {
     }
 
     public void moveDown() {
-        this.y += 13;
+        setY(getY()+20);
     }
 
-    public void moveLeft(){
-        this.x--;
-    }
-
-    public void moveRight(){
-        this.x++;
-    }
-
-    boolean movingRight = true;
-    public void moveSideways() {
+    public void moveSideways(int windowWidth) {
         if (movingRight) {
-            x += 2;
-            if (x >= 800) {
+            setX(getX()+1);
+            if (getX() >= windowWidth-100) {
                 movingRight = false;
-                this.y+=100;
+                setY(getY()+100);
             }
         } else {
-            x -= 2;
-            if (x <= 0) {
+            setX(getX()-1);;
+            if (getX() <= 0) {
                 movingRight = true;
-                this.y+=100;
+                setY(getY()+100);
             }
         }
     }
 
-    public int getX() { return x; }
-    public void setX(int x) { this.x = x; }
+    public ArrayList<EnemyBullets> getEnemyBullets() {
+        return enemyBullets;
+    }
 
-    public int getY() { return y; }
-    public void setY(int y) { this.y = y; }
-
-    public int getWidth() { return width; }
-    public void setWidth(int width) { this.width = width; }
-
-    public int getHeight() { return height; }
-    public void setHeight(int height) { this.height = height; }
-
-    public Image getImage() { return image; }
-    public void setImage(Image image) { this.image = image; }
+    public void setEnemyBullets(ArrayList<EnemyBullets> enemyBullets) {
+        this.enemyBullets = enemyBullets;
+    }
 }
 

@@ -11,39 +11,36 @@ import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Content extends JPanel implements KeyListener {
+    private Image background;
+    private boolean isGameOver;
+    private Image gameOver;
+    private SoundPlayer gameOverSound;
+    private int score;
     private Player player;
-    private  Image background;
-    private boolean rightPressed,leftPressed,upPressed,downPressed,spacePressed;
     private List<Bullet> bullets;
     private List<Meteor> meteors;
     private List<Explosion> explosions;
-    private static final int WINDOW_WIDTH = 1000;
-    private static final int WINDOW_HEIGHT = 600;
+    private List<EnemySpaceShip> enemySpaceShips;
+    private Boss[] bosses = new Boss[3];
     private static final long METEOR_SPAWN_DELAY = 1500;
+    private static final long BULLET_SPAWN_DELAY = 300;
     private long lastMeteorSpawnTime = 0;
-    private Boss1 boss1;
-    private boolean bossActive;
-    private boolean isGameOver;
+    private long lastBulletSpawnTime = 0;
+    private boolean rightPressed,leftPressed,upPressed,downPressed,spacePressed;
     private Image heartFull;
     private Image heartEmpty;
-    private Image gameOver;
-    private SoundPlayer gameOverSound;
-    private SoundPlayer trumpet;
-    private int score;
     private JLabel scoreLabel;
-    List<EnemySpaceShip> enemySpaceShips;
 
     public Content(int x, int y, int width, int height) {
         this.setBounds(x, y, width, height);
-        player = new Player(width / 2, height / 2, 100, 100);
-        boss1 = new Boss1(400, 50, 350, 170);
+        player = new Player(width / 2, height / 2, 80, 80);
+        bosses[0] = new Boss(400, 50, 350, 170);
         ImageIcon icon = new ImageIcon(getClass().getResource("/images/space1.png"));
         background = new ImageIcon(getClass().getResource("/images/backgroundGif.gif")).getImage();
         heartFull=new ImageIcon(getClass().getResource("/Images/minecraftFullHeart.png")).getImage();
         heartEmpty=new ImageIcon(getClass().getResource("/Images/minecraftEmptyHeart.png")).getImage();
         gameOver=new ImageIcon(getClass().getResource("/Images/gameOver.png")).getImage();
         gameOverSound=new SoundPlayer("/Sounds/gameOver.wav");
-        trumpet=new SoundPlayer("/Sounds/sadTrumpet.wav");
         this.setFocusable(true);
         this.requestFocusInWindow();
         this.addKeyListener(this);
@@ -91,11 +88,11 @@ public class Content extends JPanel implements KeyListener {
                 g.drawImage(heartEmpty,20+i*40,20,32,32,this);
             }
         }
-        if (bossActive && boss1 != null) {
-            boss1.draw(g);
-        }
-        if (bossActive && boss1 != null) {
-            boss1.move();
+        for (Boss boss : bosses) {
+            if (boss != null&&boss.isActive()) {
+                boss.draw(g);
+                boss.move();
+            }
         }
         if (isGameOver){
             g.drawImage(gameOver,this.getWidth()/2-250,this.getHeight()/2-250,500,500,this);
@@ -106,6 +103,7 @@ public class Content extends JPanel implements KeyListener {
         }
         scoreLabel.setText("Score:" +score);
         this.repaint();
+
     }
 
     @Override
@@ -187,41 +185,23 @@ public class Content extends JPanel implements KeyListener {
         }).start();
     }
 
-    public synchronized void bulletShoot() {
-        new Thread(() -> {
-            long lastShot = System.currentTimeMillis();
-            final int SHOOT_DELAY = 300;
-            while (!isGameOver) {
-                long now = System.currentTimeMillis();
-                if (spacePressed &&( now - lastShot > SHOOT_DELAY)) {
-                    synchronized (bullets) {
-                        bullets.add(player.shootRight());
-                        bullets.add(player.shootLeft());
-                    }
-                }
-                try {
-                    Thread.sleep(SHOOT_DELAY);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+    private void updateBullets(){
+        long now = System.currentTimeMillis();
+        ArrayList<Bullet> bulletsToRemove = new ArrayList<>();
+        for (Bullet b:bullets) {
+            if (b.getY() < 0) {
+                bulletsToRemove.add(b);
             }
-        }).start();
-        new Thread(() -> {
-            final int BULLET_SPEED = 10;
-            while (!isGameOver) {
-                  synchronized (bullets){
-                      for (Bullet b : bullets) {
-                          b.move();
-                      }
-                  }
-                repaint();
-                try {
-                    Thread.sleep(100 / BULLET_SPEED);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            else {
+                b.move();
             }
-        }).start();
+        }
+        bullets.removeAll(bulletsToRemove);
+        if (spacePressed &&( now - lastBulletSpawnTime >= BULLET_SPAWN_DELAY)) {
+            bullets.add(player.shootRight());
+            bullets.add(player.shootLeft());
+            lastBulletSpawnTime = now;
+        }
     }
 
     private void createNewMeteor(){
@@ -242,9 +222,8 @@ public class Content extends JPanel implements KeyListener {
     public void updateMeteors() {
         long now = System.currentTimeMillis();
         ArrayList<Meteor> meteorsToRemove = new ArrayList<>();
-        for (int i = 0; i < meteors.size(); i++) {
-            Meteor meteor = meteors.get(i);
-            if (meteor.getY() > WINDOW_HEIGHT) {
+        for (Meteor meteor: this.meteors) {
+            if (meteor.getY() > getHeight()) {
                 meteorsToRemove.add(meteor);
             }
             else {
@@ -258,65 +237,64 @@ public class Content extends JPanel implements KeyListener {
         }
     }
 
-    private void checkCollisionMeteorsBullets(){
-        ArrayList<Meteor> meteorsToRemove = new ArrayList<>();
-        ArrayList<Bullet> ballsToRemove = new ArrayList<>();
+    private List<Mob> checkBulletsCollision(List<Mob> mobs){
+        ArrayList<Mob> mobsToRemove = new ArrayList<>();
+        ArrayList<Bullet> bulletsToRemove = new ArrayList<>();
         OuterLoop:
-        for (int i = 0; i < bullets.size(); i++) {
-            for (int j = 0; j < meteors.size(); j++) {
-                Rectangle meteorRectangle = new Rectangle(
-                        meteors.get(j).getX() - meteors.get(j).getWidth() / 2,
-                        meteors.get(j).getY() - meteors.get(j).getHeight() / 2,
-                        meteors.get(j).getWidth(),
-                        meteors.get(j).getHeight()
+        for (Bullet bullet: bullets) {
+            for (Mob mob:mobs) {
+                Rectangle mobRectangle = new Rectangle(
+                        mob.getX() - mob.getWidth() / 2,
+                        mob.getY() - mob.getHeight() / 2,
+                        mob.getWidth(),
+                        mob.getHeight()
                 );
-                Rectangle ballRectangle = new Rectangle(bullets.get(i).getX(), bullets.get(i).getY(), bullets.get(i).getWidth(), bullets.get(i).getHeight());
-                if (meteorRectangle.intersects(ballRectangle)){
-                    meteors.get(j).meteorHit();
-                    ballsToRemove.add(this.bullets.get(i));
+                Rectangle bulletRectangle = new Rectangle(bullet.getX(), bullet.getY(), bullet.getWidth(), bullet.getHeight());
+                if (mobRectangle.intersects(bulletRectangle)) {
+                    mob.mobHit();
+                    if(mob.getLife() <= 0){
+                        score += 100;
+                        mobsToRemove.add(mob);
+                        explosions.add(new Explosion(mob.getX(), mob.getY()));
+                    }
+                    bulletsToRemove.add(bullet);
                     continue OuterLoop;
                 }
-                if(meteors.get(j).getLife()<=0){
-                    score+=100;
-                    meteorsToRemove.add(meteors.get(j));
-                    explosions.add(new Explosion(meteors.get(j).getX(), meteors.get(j).getY()));
-                }
             }
-            if (bullets.get(i).getY()+bullets.get(i).getHeight()<0){
-                ballsToRemove.add(bullets.get(i));
+            if (bullet.getY()+bullet.getHeight()<0){
+                bulletsToRemove.add(bullet);
             }
 
         }
-        bullets.removeIf(b -> b.getY() + b.getHeight() < 0);
         explosions.removeIf(Explosion::isFinished);
         explosions.forEach(Explosion::update);
-        meteors.removeAll(meteorsToRemove);
-        bullets.removeAll(ballsToRemove);
+        bullets.removeAll(bulletsToRemove);
+        return mobsToRemove;
     }
 
-    private void checkMeteorPlayerCollison(){
-        ArrayList<Meteor> meteorsToRemove = new ArrayList<>();
+    private List<Mob> checkPlayerCollision(List<Mob> mobs){
+        ArrayList<Mob> mobsToRemove = new ArrayList<>();
         Rectangle playerRectangle=new Rectangle(
                 player.getX()+20,
                 player.getY()+20,
                 player.getWidth()-40,
                 player.getHeight()-50
         );
-        for (Meteor meteor:meteors) {
-            Rectangle meteorRectangle = new Rectangle(
-                    meteor.getX() - meteor.getWidth()/2,
-                    meteor.getY() - meteor.getHeight()/2,
-                    meteor.getWidth(),
-                    meteor.getHeight()
+        for (Mob mob:mobs) {
+            Rectangle mobRectangle = new Rectangle(
+                    mob.getX() - mob.getWidth()/2,
+                    mob.getY() - mob.getHeight()/2,
+                    mob.getWidth(),
+                    mob.getHeight()
             );
             if (player.isShieldOn()){
                 continue;
             }
-            if (meteorRectangle.intersects(playerRectangle)){
+            if (mobRectangle.intersects(playerRectangle)){
                 player.setShieldOn(true);
                 player.setHp(player.getHp()-1);
-                explosions.add(new Explosion(meteor.getX(),meteor.getY()));
-                meteors.remove(meteor);
+                explosions.add(new Explosion(mob.getX(),mob.getY()));
+                mobsToRemove.add(mob);
             }
             if (player.getHp()<=0){
                 this.isGameOver=true;
@@ -333,15 +311,25 @@ public class Content extends JPanel implements KeyListener {
                 }
             }).start();
         }
+        return mobsToRemove;
     }
 
     private synchronized void action() {
         new Thread(() -> {
             while (!isGameOver) {
                 updateMeteors();
-                checkCollisionMeteorsBullets();
-                checkMeteorPlayerCollison();
-                checkBulletBossCollision();
+                updateBullets();
+                updateEnemySpaceShips();
+                meteors.removeAll(checkBulletsCollision(new ArrayList<Mob>(meteors)));
+                meteors.removeAll(checkPlayerCollision(new ArrayList<Mob>(meteors)));
+                enemySpaceShips.removeAll(checkBulletsCollision(new ArrayList<Mob>(enemySpaceShips)));
+                enemySpaceShips.removeAll(checkPlayerCollision(new ArrayList<Mob>(enemySpaceShips)));
+                for (EnemySpaceShip enemySpaceShip:enemySpaceShips){
+                   ArrayList <EnemyBullets> newBullets=enemySpaceShip.getEnemyBullets();
+                   newBullets.removeAll(checkPlayerCollision(new ArrayList<Mob>(newBullets)));
+                    enemySpaceShip.setEnemyBullets(newBullets);
+                }
+                checkBulletBossCollision(0);
                 repaint();
                 try {
                     Thread.sleep(10);
@@ -352,96 +340,75 @@ public class Content extends JPanel implements KeyListener {
         }).start();
     }
 
-    private void checkBulletBossCollision() {
-        if (!bossActive || boss1 == null) return;
-        Rectangle bossRect = boss1.getBounds();
+    private void checkBulletBossCollision(int index) {
+        if (!bosses[index].isActive() || bosses == null) return;
+        Rectangle bossRect = bosses[0].getBounds();
         List<Bullet> bulletsToRemove = new ArrayList<>();
 
         for (Bullet b : bullets) {
             Rectangle bulletRect = new Rectangle(b.getX(), b.getY(), b.getWidth(), b.getHeight());
 
             if (bossRect.intersects(bulletRect)) {
-                boss1.hit();
+                bosses[index].hit();
                 bulletsToRemove.add(b);
             }
         }
         bullets.removeAll(bulletsToRemove);
-        if (boss1.getHp() <= 0) {
-            bossActive = false;
-            explosions.add(new Explosion(boss1.getX(), boss1.getY()));
+        if (bosses[index].getLife() <= 0) {
+            bosses[index].setActive(false);
+            explosions.add(new Explosion(bosses[index].getX(), bosses[index].getY()));
         }
     }
 
-    private void enemySpaceShipMove() {
-        new Thread(() -> {
-            while (true) {
-                ArrayList<EnemySpaceShip> toRemove = new ArrayList<>();
-                for (EnemySpaceShip enemySpaceShip : enemySpaceShips) {
-                    if (enemySpaceShip.getY() < 50) {
-                        enemySpaceShip.moveDown();
-                    } else {
-                        enemySpaceShip.moveSideways();
-                        enemySpaceShip.shoot();
-                        enemySpaceShip.bulletsMove();
-                    }
-
-
-                    if (enemySpaceShip.getY() >= 900) {
-                        toRemove.add(enemySpaceShip);
-                    }
+    private void updateEnemySpaceShips(){
+        ArrayList<EnemySpaceShip> toRemove = new ArrayList<>();
+        for (EnemySpaceShip enemySpaceShip : enemySpaceShips) {
+            if (enemySpaceShip.getY() > getHeight()) {
+                toRemove.add(enemySpaceShip);
+            } else {
+                if(enemySpaceShip.getY()<=30){
+                    enemySpaceShip.moveDown();
                 }
-                enemySpaceShips.removeAll(toRemove);
-                repaint();
-                try {
-                    Thread.sleep(12);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+                else {
+                    enemySpaceShip.updateBullets();
+                    enemySpaceShip.moveSideways(getWidth());
                 }
             }
-        }).start();
-    }
 
-    private void enemySpaceShipSpawner() {
-        new Thread(() -> {
-            while (true) {
-                try {
-                    Thread.sleep(30000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-                for (int i = 0; i < 1; i++) {
-                    enemySpaceShips.add(new EnemySpaceShip(300 + i * 300, -20));
-                }
-            }
-        }).start();
+        }
+        enemySpaceShips.removeAll(toRemove);
     }
-
 
     private void gameCourse(){
         allDirections();
-        bulletShoot();
         action();
+        final int[] enemyRespawn = {2000};
         new Thread(()-> {
-
             while (!isGameOver) {
-                if (score > 1000) {
-                    enemySpaceShipMove();
-                    enemySpaceShipSpawner();
+                if (score > enemyRespawn[0]) {
+                    enemySpaceShips.add(new EnemySpaceShip(getWidth()/2,-15));
+                    try {
+                        Thread.sleep(5000);
+                    }catch (InterruptedException e){
+                        e.printStackTrace();
+                    }
+                    enemySpaceShips.add(new EnemySpaceShip(getWidth()/2,-15));
+                    enemyRespawn[0] +=2000;
                 }
-                if (score > 2000) {
-                    bossActive = true;
+                if (score > 5000) {
+                    bosses[0].setActive(true);
                 }
-                score += 10;
+                score += 1;
                 scoreLabel.setText("Score:" + score);
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(60);
                 }catch (InterruptedException e){
                     e.printStackTrace();
                 }
             }
         }).start();
     }
-    private void enemySpaceShipsActions(){
+    private void enemiesAction(){
 
     }
 }
