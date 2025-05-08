@@ -7,13 +7,13 @@ import java.awt.event.KeyListener;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Content extends JPanel implements KeyListener {
-    private Image background;
+    private Image background, gameOver, heartFull, heartEmpty;
     private boolean isGameOver;
-    private Image gameOver;
     private SoundPlayer gameOverSound;
     private int score;
     private Player player;
@@ -21,44 +21,48 @@ public class Content extends JPanel implements KeyListener {
     private List<Meteor> meteors;
     private List<Explosion> explosions;
     private List<EnemySpaceShip> enemySpaceShips;
-    private Boss[] bosses = new Boss[3];
-    private static final long METEOR_SPAWN_DELAY = 1500;
-    private static final long BULLET_SPAWN_DELAY = 300;
-    private long lastMeteorSpawnTime = 0;
-    private long lastBulletSpawnTime = 0;
+    private List<Boss> bosses;
+    private static final long METEOR_SPAWN_DELAY = 1500,BULLET_SPAWN_DELAY = 300,ENEMY_RESPAWN_INTERVAL = 5000;
+    private long lastMeteorSpawnTime = 0, lastBulletSpawnTime = 0,lastEnemySpawnTime = 0;
     private boolean rightPressed,leftPressed,upPressed,downPressed,spacePressed;
-    private Image heartFull;
-    private Image heartEmpty;
     private JLabel scoreLabel;
-    private long lastEnemySpawnTime = 0;
-    private long lastBossSpawnTime = 0;
-    private static final long ENEMY_RESPAWN_INTERVAL = 5000;
-    private static final long BOSS_TRIGGER_SCORE = 5000;
+
 
     public Content(int x, int y, int width, int height) {
         this.setBounds(x, y, width, height);
-        player = new Player(width / 2, height / 2, 80, 80);
-        bosses[0] = new Boss(400, 50, 350, 170);
-        ImageIcon icon = new ImageIcon(getClass().getResource("/images/space1.png"));
-        background = new ImageIcon(getClass().getResource("/images/backgroundGif.gif")).getImage();
-        heartFull=new ImageIcon(getClass().getResource("/Images/minecraftFullHeart.png")).getImage();
-        heartEmpty=new ImageIcon(getClass().getResource("/Images/minecraftEmptyHeart.png")).getImage();
-        gameOver=new ImageIcon(getClass().getResource("/Images/gameOver.png")).getImage();
-        gameOverSound=new SoundPlayer("/Sounds/gameOver.wav");
+        imageSoundBuilder();
         this.setFocusable(true);
         this.requestFocusInWindow();
         this.addKeyListener(this);
+        player = new Player(width / 2, height / 2, 80, 80);
+        mobBuilder();
+        scoreBuilder();
+        gameCourse();
+    }
+
+    private void imageSoundBuilder(){
+        this.background = new ImageIcon(Objects.requireNonNull(getClass().getResource("/images/backgroundGif.gif"))).getImage();
+        this.heartFull=new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/minecraftFullHeart.png"))).getImage();
+        this.heartEmpty=new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/minecraftEmptyHeart.png"))).getImage();
+        this.gameOver=new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/gameOver.png"))).getImage();
+        this.gameOverSound=new SoundPlayer("/Sounds/gameOver.wav");
+    }
+
+    private void mobBuilder(){
+        this.bosses = new CopyOnWriteArrayList<>();
         this.meteors = new CopyOnWriteArrayList<>();
         this.bullets = new CopyOnWriteArrayList<>();
         this.explosions = new CopyOnWriteArrayList<>();
         this.enemySpaceShips=new CopyOnWriteArrayList<>();
+    }
+
+    private void scoreBuilder(){
         this.score=0;
-        scoreLabel=new JLabel("Score: "+score);
-        scoreLabel.setFont(new Font("Arial",Font.PLAIN,24));
-        scoreLabel.setForeground(Color.WHITE);
-        scoreLabel.setBounds(getWidth(),20,200,30);
+        this.scoreLabel=new JLabel("Score: "+score);
+        this.scoreLabel.setFont(new Font("Arial",Font.PLAIN,24));
+        this.scoreLabel.setForeground(Color.WHITE);
+        this.scoreLabel.setBounds(getWidth(),20,200,30);
         this.add(scoreLabel);
-        gameCourse();
     }
 
     public void paintComponent(Graphics g) {
@@ -66,46 +70,41 @@ public class Content extends JPanel implements KeyListener {
         g.drawImage(background, 0, 0, getWidth(), getHeight(), this);
         if (!this.isGameOver) {
             this.player.paint(g);
-        }
-        for (Bullet b: bullets){
-            synchronized (bullets) {
+            for (Bullet b: bullets){
                 b.draw(g);
             }
-        }
-        for (Explosion explosion : explosions) {
-            explosion.paint(g);
-        }
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        for (Meteor meteor : meteors){
-            AffineTransform oldTransform = g2d.getTransform();
-            g2d.rotate(Math.toRadians(meteor.getRotationAngle()), meteor.getX(), meteor.getY());
-            meteor.paint(g2d);
-            g2d.setTransform(oldTransform);
-            meteor.rotate();
-        }
-        for (int i = 0; i < player.getMaxHp(); i++) {
-            if (player.getHp()>i){
-                g.drawImage(heartFull,20+i*40,20,32,32,this);
+            for (Explosion explosion : explosions) {
+                explosion.paint(g);
             }
-            else {
-                g.drawImage(heartEmpty,20+i*40,20,32,32,this);
+            Graphics2D g2d = (Graphics2D) g;
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            for (Meteor meteor : meteors){
+                AffineTransform oldTransform = g2d.getTransform();
+                g2d.rotate(Math.toRadians(meteor.getRotationAngle()), meteor.getX(), meteor.getY());
+                meteor.paint(g2d);
+                g2d.setTransform(oldTransform);
+                meteor.rotate();
             }
-        }
-        for (Boss boss : bosses) {
-            if (boss != null&&boss.isActive()) {
+            for (int i = 0; i < player.getMaxHp(); i++) {
+                if (player.getHp()>i){
+                    g.drawImage(heartFull,20+i*40,20,32,32,this);
+                }
+                else {
+                    g.drawImage(heartEmpty,20+i*40,20,32,32,this);
+                }
+            }
+            for (Boss boss : bosses) {
                 boss.draw(g);
                 boss.move();
             }
+            for (EnemySpaceShip enemySpaceShip : enemySpaceShips) {
+                enemySpaceShip.paint(g);
+            }
+            scoreLabel.setText("Score:" +score);
         }
         if (isGameOver){
             g.drawImage(gameOver,this.getWidth()/2-250,this.getHeight()/2-250,500,500,this);
-
         }
-        for (EnemySpaceShip enemySpaceShip : enemySpaceShips) {
-            enemySpaceShip.paint(g);
-        }
-        scoreLabel.setText("Score:" +score);
         this.repaint();
 
     }
@@ -241,7 +240,7 @@ public class Content extends JPanel implements KeyListener {
         }
     }
 
-    private List<Mob> checkBulletsCollision(List<Mob> mobs){
+    private List<Mob> checkBulletsCollision(List<Mob> mobs, int pointsPerHit){
         ArrayList<Mob> mobsToRemove = new ArrayList<>();
         ArrayList<Bullet> bulletsToRemove = new ArrayList<>();
         OuterLoop:
@@ -253,11 +252,16 @@ public class Content extends JPanel implements KeyListener {
                         mob.getWidth(),
                         mob.getHeight()
                 );
-                Rectangle bulletRectangle = new Rectangle(bullet.getX(), bullet.getY(), bullet.getWidth(), bullet.getHeight());
+                Rectangle bulletRectangle = new Rectangle(
+                        bullet.getX(),
+                        bullet.getY(),
+                        bullet.getWidth(),
+                        bullet.getHeight()
+                );
                 if (mobRectangle.intersects(bulletRectangle)) {
                     mob.mobHit();
                     if(mob.getLife() <= 0){
-                        score += 100;
+                        score += pointsPerHit;
                         mobsToRemove.add(mob);
                         explosions.add(new Explosion(mob.getX(), mob.getY()));
                     }
@@ -272,6 +276,12 @@ public class Content extends JPanel implements KeyListener {
         }
         bullets.removeAll(bulletsToRemove);
         return mobsToRemove;
+    }
+
+    private void updateExplosions(){
+        explosions.removeIf(Explosion::isFinished);
+        explosions.forEach(Explosion::update);
+
     }
 
     private List<Mob> checkPlayerCollision(List<Mob> mobs){
@@ -323,16 +333,16 @@ public class Content extends JPanel implements KeyListener {
                 updateBullets();
                 updateEnemySpaceShips();
                 updateExplosions();
-                meteors.removeAll(checkBulletsCollision(new ArrayList<Mob>(meteors)));
-                meteors.removeAll(checkPlayerCollision(new ArrayList<Mob>(meteors)));
-                enemySpaceShips.removeAll(checkBulletsCollision(new ArrayList<Mob>(enemySpaceShips)));
-                enemySpaceShips.removeAll(checkPlayerCollision(new ArrayList<Mob>(enemySpaceShips)));
+                this.meteors.removeAll(checkBulletsCollision(new ArrayList<Mob>(meteors),100));
+                this.meteors.removeAll(checkPlayerCollision(new ArrayList<Mob>(meteors)));
+                this.enemySpaceShips.removeAll(checkBulletsCollision(new ArrayList<Mob>(enemySpaceShips),200));
+                this.enemySpaceShips.removeAll(checkPlayerCollision(new ArrayList<Mob>(enemySpaceShips)));
                 for (EnemySpaceShip enemySpaceShip:enemySpaceShips){
-                   ArrayList <EnemyBullets> newBullets=enemySpaceShip.getEnemyBullets();
+                   ArrayList <EnemyBullets> newBullets = enemySpaceShip.getEnemyBullets();
                    newBullets.removeAll(checkPlayerCollision(new ArrayList<Mob>(newBullets)));
-                    enemySpaceShip.setEnemyBullets(newBullets);
+                   enemySpaceShip.setEnemyBullets(newBullets);
                 }
-                checkBulletBossCollision(0);
+                checkBulletBossCollision();
                 repaint();
                 try {
                     Thread.sleep(10);
@@ -343,25 +353,21 @@ public class Content extends JPanel implements KeyListener {
         }).start();
     }
 
-    private void checkBulletBossCollision(int index) {
-        if (!bosses[index].isActive() || bosses == null) return;
-        Rectangle bossRect = bosses[0].getBounds();
+    private void checkBulletBossCollision() {
+        if (bosses.isEmpty()) return;
+        Rectangle bossRect = bosses.get(0).getBounds();
         List<Bullet> bulletsToRemove = new ArrayList<>();
-
         for (Bullet b : bullets) {
             Rectangle bulletRect = new Rectangle(b.getX(), b.getY(), b.getWidth(), b.getHeight());
-
             if (bossRect.intersects(bulletRect)) {
-                bosses[index].hit();
+                bosses.get(0).mobHit();
                 bulletsToRemove.add(b);
             }
         }
         bullets.removeAll(bulletsToRemove);
-        if (bosses[index].getLife() <= 0) {;
-            if (bosses[index].isActive()) {
-                explosions.add(new Explosion(bosses[index].getX(), bosses[index].getY()));
-            }
-            bosses[index].setActive(false);
+        if (bosses.get(0).getLife() <= 0) {;
+            explosions.add(new Explosion(bosses.get(0).getX(), bosses.get(0).getY()));
+            bosses.remove(bosses.get(0));
         }
     }
 
@@ -392,13 +398,13 @@ public class Content extends JPanel implements KeyListener {
         new Thread(()-> {
             while (!isGameOver) {
                 long now = System.currentTimeMillis();
-                if (score > enemyRespawn[0] &&now-lastEnemySpawnTime>=ENEMY_RESPAWN_INTERVAL) {
+                if (score > enemyRespawn[0] && now-lastEnemySpawnTime>=ENEMY_RESPAWN_INTERVAL) {
                     enemySpaceShips.add(new EnemySpaceShip(getWidth()/2,-15));
                     lastEnemySpawnTime=0;
                     enemyRespawn[0] +=2000;
                     }
-                if (score > 2000&& !bosses[0].isActive()&&bosses[0].getLife()>0) {
-                    bosses[0].setActive(true);
+                if (score > 500 && bosses.isEmpty()) {
+                    bosses.add(new Boss(1));
                 }
                 try {
                     Thread.sleep(60);
@@ -408,6 +414,7 @@ public class Content extends JPanel implements KeyListener {
             }
         }).start();
     }
+
     private void infiniteScoreAdd(){
         new Thread(()->{
             while (!isGameOver) {
@@ -419,10 +426,5 @@ public class Content extends JPanel implements KeyListener {
                 }
             }
         }).start();
-    }
-    private void updateExplosions(){
-        explosions.removeIf(Explosion::isFinished);
-        explosions.forEach(Explosion::update);
-
     }
 }

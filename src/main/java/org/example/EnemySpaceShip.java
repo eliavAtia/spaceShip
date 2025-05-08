@@ -37,7 +37,7 @@ public class EnemySpaceShip extends Mob {
             }
         }
         enemyBullets.removeAll(toRemove);
-        if (getY() > 100 && currentTime - lastShotTime >= SHOOT_SPAWN_DELAY){
+        if (getY() > 30 && currentTime - lastShotTime >= SHOOT_SPAWN_DELAY){
             enemyBullets.add(new EnemyBullets(getX() + getWidth()/3 , getY()+ getHeight()/2));
             lastShotTime = currentTime;
         }
@@ -45,10 +45,10 @@ public class EnemySpaceShip extends Mob {
 
     public void paint(Graphics graphics){
         if (getImage() != null) {
-            graphics.drawImage(getImage(), getX(), getY(), getWidth(), getHeight(), null);
+            graphics.drawImage(getImage(), getX() - getWidth()/2, getY() - getHeight()/2, getWidth(), getHeight(), null);
         } else {
             graphics.setColor(Color.RED);
-            graphics.fillRect(getX(), getY(), getWidth(), getHeight());
+            graphics.fillRect(getX() - getWidth()/2, getY() - getHeight()/2, getWidth(), getHeight());
             graphics.setColor(Color.BLACK);
             graphics.drawString("תמונה חסרה", getX() + 10, getY() + getHeight() / 2);
         }
@@ -59,7 +59,7 @@ public class EnemySpaceShip extends Mob {
     }
 
     public void moveDown() {
-        setY(getY()+20);
+        setY(getY()+1);
     }
 
     public void moveSideways(int windowWidth) {

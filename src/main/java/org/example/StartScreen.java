@@ -23,7 +23,7 @@ public class StartScreen extends JPanel {
         setLayout(null);
 
         backGround = new SoundPlayer("/Sounds/RICK_AND_MORTY.wav");
-        backGround.playLoop();
+//        backGround.playLoop();
 
         Gif = new ImageIcon(getClass().getResource("/Images/space 4K gif.gif"));
 
@@ -85,7 +85,7 @@ public class StartScreen extends JPanel {
 
     private void StartGame() {
         this.removeAll();
-        backGround.stop();
+//        backGround.stop();
         game = new Content(0, 0, getWidth(), getHeight());
         this.add(game);
         game.requestFocusInWindow();

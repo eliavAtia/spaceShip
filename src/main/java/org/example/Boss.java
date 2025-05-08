@@ -2,32 +2,39 @@ package org.example;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Objects;
 
 public class Boss extends  Mob {
-    private int speed = 1; // מהירות הבוס
+    private int speed = 1;
     private int direction = 1;
-    private int maxHp = 30;
-    private boolean active;
+    private int type;
+    private int maxHp;
 
-    public Boss(int x, int y, int width, int height) {
-        setX(x);
-        setY(y);
-        setHeight(height);
-        setWidth(width);
-        setLife(maxHp);
-        setImage(new ImageIcon(getClass().getResource("/Images/Boss1.png")).getImage());
+    public Boss(int type) {
+        this.type = type;
+        setByType();
+    }
+
+    private void setByType(){
+        switch (this.type){
+            case 1:
+                setX(400);
+                setY(50);
+                setHeight(350);
+                setWidth(170);
+                this.maxHp=30;
+                setLife(maxHp);
+                setImage(new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/Boss1.png"))).getImage());
+        }
+
     }
 
     public void draw(Graphics g) {
-        g.drawImage(getImage(), getX(), getY(), getWidth(), getHeight(), null);
+        g.drawImage(getImage(), getX() - getWidth()/2, getY() - getHeight()/2, getWidth(), getHeight(), null);
         g.setColor(Color.BLACK);
         g.fillRect(getX(), getY() - 20, getWidth(), 10);
         g.setColor(Color.RED);
         g.fillRect(getX(), getY() - 20, (int) ((double) getLife() / maxHp * getWidth()), 10);
-    }
-
-    public Rectangle getBounds() {
-        return new Rectangle(getX(), getY() - getHeight() / 2, getWidth(), getHeight());
     }
 
     public void move() {
@@ -39,19 +46,8 @@ public class Boss extends  Mob {
         }
     }
 
-    public void hit() {
-        super.mobHit();
+    public Rectangle getBounds() {
+        return new Rectangle(getX(), getY() - getHeight() / 2, getWidth(), getHeight());
     }
 
-    public boolean isDead() {
-        return getLife() <= 0;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
-    public boolean isActive() {
-        return active;
-    }
 }
