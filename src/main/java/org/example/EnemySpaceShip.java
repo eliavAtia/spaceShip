@@ -15,9 +15,9 @@ public class EnemySpaceShip extends Mob {
     public EnemySpaceShip(int x, int y){
         setX(x);
         setY(y);
-        setHeight(150);
-        setWidth(150);
-        setLife(5);
+        setHeight(200);
+        setWidth(200);
+        setLife(20);
         try {
             ImageIcon imageIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/Enemy.png")));
             setImage(imageIcon.getImage());
@@ -37,25 +37,26 @@ public class EnemySpaceShip extends Mob {
             }
         }
         enemyBullets.removeAll(toRemove);
-        if (getY() > 30 && currentTime - lastShotTime >= SHOOT_SPAWN_DELAY){
+        if (getY() > 70 && currentTime - lastShotTime >= SHOOT_SPAWN_DELAY){
             enemyBullets.add(new EnemyBullets(getX() + getWidth()/3 , getY()+ getHeight()/2));
             lastShotTime = currentTime;
         }
     }
 
     public void paint(Graphics graphics){
-        if (getImage() != null) {
-            graphics.drawImage(getImage(), getX() - getWidth()/2, getY() - getHeight()/2, getWidth(), getHeight(), null);
-        } else {
-            graphics.setColor(Color.RED);
-            graphics.fillRect(getX() - getWidth()/2, getY() - getHeight()/2, getWidth(), getHeight());
-            graphics.setColor(Color.BLACK);
-            graphics.drawString("תמונה חסרה", getX() + 10, getY() + getHeight() / 2);
+        if(isShouldDrawMobImage()){
+            if (getImage() != null) {
+                graphics.drawImage(getImage(), getX() - getWidth()/2, getY() - getHeight()/2, getWidth(), getHeight(), null);
+            } else {
+                graphics.setColor(Color.RED);
+                graphics.fillRect(getX() - getWidth()/2, getY() - getHeight()/2, getWidth(), getHeight());
+                graphics.setColor(Color.BLACK);
+                graphics.drawString("תמונה חסרה", getX() + 10, getY() + getHeight() / 2);
+            }
+            for (EnemyBullets enemyBullet : enemyBullets){
+                enemyBullet.paint(graphics);
+            }
         }
-        for (EnemyBullets enemyBullet : enemyBullets){
-            enemyBullet.paint(graphics);
-        }
-
     }
 
     public void moveDown() {

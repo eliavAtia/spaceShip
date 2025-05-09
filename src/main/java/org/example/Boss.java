@@ -18,10 +18,10 @@ public class Boss extends  Mob {
     private void setByType(){
         switch (this.type){
             case 1:
-                setX(400);
+                setX(getWidth()/2);
                 setY(50);
                 setHeight(350);
-                setWidth(170);
+                setWidth(700);
                 this.maxHp=30;
                 setLife(maxHp);
                 setImage(new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/Boss1.png"))).getImage());

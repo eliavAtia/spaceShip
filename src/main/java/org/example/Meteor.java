@@ -27,6 +27,7 @@ public class Meteor extends Mob{
 
 
     public void paint(Graphics g) {
+        if(isShouldDrawMobImage())
         if (image != null) {
             g.drawImage(image, getX() - getWidth()/2, getY() - getHeight()/2, getWidth(), getHeight(), null);
         } else {
@@ -45,10 +46,6 @@ public class Meteor extends Mob{
         else {
             this.rotationAngle+=2;
         }
-    }
-
-    public void meteorHit(){
-        super.mobHit();
     }
 
     public int getRotationAngle() {

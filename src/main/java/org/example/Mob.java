@@ -9,6 +9,28 @@ public class Mob {
     private int height;
     private int life = 0;
     private Image image;
+    private boolean gotHit;
+    private boolean shouldDrawMobImage=true;
+
+    public void startFlashingEffect() {
+        new Thread(() -> {
+            if(gotHit) {
+                shouldDrawMobImage = false;
+                try {
+                    Thread.sleep(60);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            shouldDrawMobImage = true;
+            gotHit=false;
+        }).start();
+    }
+
+    public boolean isShouldDrawMobImage() {
+        return shouldDrawMobImage;
+    }
+
 
     public int getX() {
         return x;
@@ -60,5 +82,7 @@ public class Mob {
 
     public void mobHit(){
         this.life--;
+        this.gotHit=true;
+        startFlashingEffect();
     }
 }
