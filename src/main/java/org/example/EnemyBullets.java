@@ -10,8 +10,8 @@ public class EnemyBullets extends Mob {
     public EnemyBullets(int x, int y) {
         setX(x);
         setY(y);
-        setWidth(50);
-        setHeight(50);
+        setWidth(60);
+        setHeight(60);
         setLife(1);
         try {
             ImageIcon imageIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/cow.png")));

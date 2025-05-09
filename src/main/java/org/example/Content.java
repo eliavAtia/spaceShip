@@ -22,11 +22,11 @@ public class Content extends JPanel implements KeyListener {
     private List<Explosion> explosions;
     private List<EnemySpaceShip> enemySpaceShips;
     private List<Boss> bosses;
-//    private boolean boss1Defeated,boss3Defeated,boss2Defeated, bossActivated;
-    private static final long METEOR_SPAWN_DELAY = 1500,BULLET_SPAWN_DELAY = 300;
     private long lastMeteorSpawnTime = 0, lastBulletSpawnTime = 0;
     private boolean rightPressed,leftPressed,upPressed,downPressed,spacePressed;
+    private static final long METEOR_SPAWN_DELAY = 1500,BULLET_SPAWN_DELAY = 300;
     private JLabel scoreLabel;
+//    private boolean boss1Defeated,boss3Defeated,boss2Defeated, bossActivated;
 
 
     public Content(int x, int y, int width, int height) {
@@ -62,7 +62,7 @@ public class Content extends JPanel implements KeyListener {
         this.scoreLabel=new JLabel("Score: "+score);
         this.scoreLabel.setFont(new Font("Arial",Font.PLAIN,24));
         this.scoreLabel.setForeground(Color.WHITE);
-        this.scoreLabel.setBounds(getWidth(),20,200,30);
+        this.scoreLabel.setBounds(20,60,200,30);
         this.add(scoreLabel);
     }
 
@@ -101,13 +101,18 @@ public class Content extends JPanel implements KeyListener {
             for (EnemySpaceShip enemySpaceShip : enemySpaceShips) {
                 enemySpaceShip.paint(g);
             }
-            scoreLabel.setText("Score:" +score);
+            scoreLabel.setText("Score: " +score);
         }
-        if (isGameOver){
+        else {
             g.drawImage(gameOver,this.getWidth()/2-250,this.getHeight()/2-250,500,500,this);
+            g.setFont(new Font("Arial", Font.BOLD, 32));
+            g.setColor(Color.WHITE);
+            String scoreText = "Your Score: " + score;
+            int textWidth = g.getFontMetrics().stringWidth(scoreText);
+            g.drawString(scoreText, this.getWidth()/2 - textWidth / 2, this.getHeight()/2+200);
+            scoreLabel.setVisible(false);
         }
         this.repaint();
-
     }
 
     @Override
@@ -327,6 +332,38 @@ public class Content extends JPanel implements KeyListener {
         return mobsToRemove;
     }
 
+    private void updateEnemySpaceShips(){
+        ArrayList<EnemySpaceShip> toRemove = new ArrayList<>();
+        for (EnemySpaceShip enemySpaceShip : enemySpaceShips) {
+            if (enemySpaceShip.getY() > getHeight()) {
+                toRemove.add(enemySpaceShip);
+            } else {
+                if(enemySpaceShip.getY()<=70){
+                    enemySpaceShip.moveDown();
+                }
+                else {
+                    enemySpaceShip.updateBullets();
+                    enemySpaceShip.moveSideways(getWidth());
+                }
+            }
+
+        }
+        enemySpaceShips.removeAll(toRemove);
+    }
+
+    private void infiniteScoreAdd(){
+        new Thread(()->{
+            while (!isGameOver) {
+                score++;
+                try {
+                    Thread.sleep(60);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
     private synchronized void action() {
         final int[] enemyRespawn = {2000};
         new Thread(() -> {
@@ -358,6 +395,15 @@ public class Content extends JPanel implements KeyListener {
         }).start();
     }
 
+    private void gameCourse(){
+        allDirections();
+        infiniteScoreAdd();
+        action();
+//        BossActivation();
+    }
+
+
+
 //    private void checkBulletBossCollision() {
 //        if (bosses.isEmpty()) return;
 //        Rectangle bossRect = bosses.get(0).getBounds();
@@ -375,28 +421,10 @@ public class Content extends JPanel implements KeyListener {
 //                }
 //            }
 //        }
+
 //        bullets.removeAll(bulletsToRemove);
+
 //    }
-
-    private void updateEnemySpaceShips(){
-        ArrayList<EnemySpaceShip> toRemove = new ArrayList<>();
-        for (EnemySpaceShip enemySpaceShip : enemySpaceShips) {
-            if (enemySpaceShip.getY() > getHeight()) {
-                toRemove.add(enemySpaceShip);
-            } else {
-                if(enemySpaceShip.getY()<=70){
-                    enemySpaceShip.moveDown();
-                }
-                else {
-                    enemySpaceShip.updateBullets();
-                    enemySpaceShip.moveSideways(getWidth());
-                }
-            }
-
-        }
-        enemySpaceShips.removeAll(toRemove);
-    }
-
 //    private void BossActivation(){
 //        new Thread(()-> {
 //            while (!isGameOver) {
@@ -414,26 +442,7 @@ public class Content extends JPanel implements KeyListener {
 //                }
 //            }
 //        }).start();
+
 //    }
-
-    private void gameCourse(){
-        allDirections();
-        infiniteScoreAdd();
-        action();
-//        BossActivation();
-    }
-
-    private void infiniteScoreAdd(){
-        new Thread(()->{
-            while (!isGameOver) {
-                score++;
-                try {
-                    Thread.sleep(60);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-    }
 
 }

@@ -9,7 +9,8 @@ public class EnemySpaceShip extends Mob {
     ArrayList<EnemyBullets> enemyBullets = new ArrayList<>();
     private long lastShotTime = 0;
     private static final long SHOOT_SPAWN_DELAY = 1500;
-    boolean movingRight = true;
+    private boolean movingRight = true;
+    private int maxHp;
 
 
     public EnemySpaceShip(int x, int y){
@@ -17,7 +18,8 @@ public class EnemySpaceShip extends Mob {
         setY(y);
         setHeight(200);
         setWidth(200);
-        setLife(20);
+        this.maxHp = 30;
+        setLife(maxHp);
         try {
             ImageIcon imageIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/Enemy.png")));
             setImage(imageIcon.getImage());
@@ -38,7 +40,7 @@ public class EnemySpaceShip extends Mob {
         }
         enemyBullets.removeAll(toRemove);
         if (getY() > 70 && currentTime - lastShotTime >= SHOOT_SPAWN_DELAY){
-            enemyBullets.add(new EnemyBullets(getX() + getWidth()/3 , getY()+ getHeight()/2));
+            enemyBullets.add(new EnemyBullets(getX() , getY()+10));
             lastShotTime = currentTime;
         }
     }
@@ -47,6 +49,9 @@ public class EnemySpaceShip extends Mob {
         if(isShouldDrawMobImage()){
             if (getImage() != null) {
                 graphics.drawImage(getImage(), getX() - getWidth()/2, getY() - getHeight()/2, getWidth(), getHeight(), null);
+                graphics.fillRect(getX() - getWidth()/2 , getY() - getHeight()/2+50, getWidth(), 10);
+                graphics.setColor(Color.RED);
+                graphics.fillRect(getX() - getWidth()/2 , getY() - getHeight()/2+50, (int) ((double) getLife() / maxHp * getWidth()), 10);
             } else {
                 graphics.setColor(Color.RED);
                 graphics.fillRect(getX() - getWidth()/2, getY() - getHeight()/2, getWidth(), getHeight());
