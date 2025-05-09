@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.geom.AffineTransform;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -26,6 +27,7 @@ public class Content extends JPanel implements KeyListener {
     private boolean rightPressed,leftPressed,upPressed,downPressed,spacePressed;
     private static final long METEOR_SPAWN_DELAY = 1500,BULLET_SPAWN_DELAY = 300;
     private JLabel scoreLabel;
+    private static Font customFont;
 //    private boolean boss1Defeated,boss3Defeated,boss2Defeated, bossActivated;
 
 
@@ -58,11 +60,21 @@ public class Content extends JPanel implements KeyListener {
     }
 
     private void scoreBuilder(){
-        this.score=0;
-        this.scoreLabel=new JLabel("Score: "+score);
-        this.scoreLabel.setFont(new Font("Arial",Font.PLAIN,24));
+        this.score = 0;
+        this.scoreLabel = new JLabel("Score: " + score);
+        try {
+            customFont = Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(getClass().getResourceAsStream("/fonts/PressStart2P-Regular.ttf"))).deriveFont(24f);
+            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            ge.registerFont(customFont);
+            this.scoreLabel.setFont(customFont);
+        } catch (IOException | FontFormatException e) {
+            e.printStackTrace();
+            customFont = new Font("Arial", Font.PLAIN, 24);
+            this.scoreLabel.setFont(customFont);
+        }
         this.scoreLabel.setForeground(Color.WHITE);
-        this.scoreLabel.setBounds(20,60,200,30);
+        this.scoreLabel.setBounds(20, 65, 500, 30);
+        scoreLabel.setForeground(new Color(243, 202, 0));
         this.add(scoreLabel);
     }
 
@@ -105,11 +117,11 @@ public class Content extends JPanel implements KeyListener {
         }
         else {
             g.drawImage(gameOver,this.getWidth()/2-250,this.getHeight()/2-250,500,500,this);
-            g.setFont(new Font("Arial", Font.BOLD, 32));
+            g.setFont(Content.customFont.deriveFont(32f));
             g.setColor(Color.WHITE);
             String scoreText = "Your Score: " + score;
             int textWidth = g.getFontMetrics().stringWidth(scoreText);
-            g.drawString(scoreText, this.getWidth()/2 - textWidth / 2, this.getHeight()/2+200);
+            g.drawString(scoreText, this.getWidth() / 2 - textWidth / 2, this.getHeight() / 2 + 200);
             scoreLabel.setVisible(false);
         }
         this.repaint();
