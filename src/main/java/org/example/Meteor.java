@@ -17,7 +17,7 @@ public class Meteor extends Mob{
         setY(y);
         setHeight(size);
         setWidth(size);
-        setLife(3);
+        setLife(4);
         try {
             this.image = ImageIO.read(Objects.requireNonNull(getClass().getResource("/images/img.png")));
         } catch (IOException e) {
