@@ -13,5 +13,6 @@ public class Main {
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.setLayout(null);
         window.setVisible(true);
+
     }
 }

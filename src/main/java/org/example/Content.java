@@ -43,6 +43,7 @@ public class Content extends JPanel implements KeyListener {
         gameCourse();
     }
 
+
     private void imageSoundBuilder(){
         this.background = new ImageIcon(Objects.requireNonNull(getClass().getResource("/images/backgroundGif.gif"))).getImage();
         this.heartFull=new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/minecraftFullHeart.png"))).getImage();
