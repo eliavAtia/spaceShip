@@ -33,6 +33,7 @@ public class Content extends JPanel implements KeyListener {
     private StartScreen menu;
     private JFrame frame;
     private Thread directionThread,scoreThread,actionThread;
+    private List<Boost> boosts;
 //    private boolean boss1Defeated,boss3Defeated,boss2Defeated, bossActivated;
 
 
@@ -70,6 +71,7 @@ public class Content extends JPanel implements KeyListener {
         this.meteors = new CopyOnWriteArrayList<>();
         this.explosions = new CopyOnWriteArrayList<>();
         this.enemySpaceShips=new CopyOnWriteArrayList<>();
+        this.boosts=new CopyOnWriteArrayList<>();
     }
 
     private void scoreBuilder(){
@@ -156,6 +158,11 @@ public class Content extends JPanel implements KeyListener {
         else {
             gameOverPaintComponent(g);
         }
+        for (int i = 1; i < player.getBoostsThatAreOn().length; i++) {
+            if (player.getBoostsThatAreOn()[i]){
+                g.drawImage(new Boost(0,0,i+1,player).getImage(),20+(i-1)*40,100,30,30,null);
+            }
+        }
         this.repaint();
     }
 
@@ -200,6 +207,9 @@ public class Content extends JPanel implements KeyListener {
             enemySpaceShip.paint(g);
         }
         scoreLabel.setText("Score: " +score);
+        for (Boost boost:boosts){
+            boost.draw(g);
+        }
     }
 
     private void gameOverPaintComponent(Graphics g){
@@ -359,49 +369,7 @@ public class Content extends JPanel implements KeyListener {
         explosions.forEach(Explosion::update);
 
     }
-
-
-
     //collision
-    private List<Mob> checkBulletsCollision(List<Mob> mobs, int pointsPerHit){
-        ArrayList<Mob> mobsToRemove = new ArrayList<>();
-        ArrayList<Bullet> bulletsToRemove = new ArrayList<>();
-        OuterLoop:
-        for (Bullet bullet: player.getBullets()) {
-            for (Mob mob:mobs) {
-                Rectangle mobRectangle = new Rectangle(
-                        mob.getX() - mob.getWidth() / 2,
-                        mob.getY() - mob.getHeight() / 2,
-                        mob.getWidth(),
-                        mob.getHeight()-40
-                );
-                Rectangle bulletRectangle = new Rectangle(
-                        bullet.getX(),
-                        bullet.getY(),
-                        bullet.getWidth(),
-                        bullet.getHeight()
-                );
-                if (mobRectangle.intersects(bulletRectangle)) {
-                    mob.mobHit();
-                    if(mob.getLife() <= 0){
-                        score += pointsPerHit;
-                        mobsToRemove.add(mob);
-                        explosions.add(new Explosion(mob.getX(), mob.getY()));
-                    }
-                    bulletsToRemove.add(bullet);
-                    continue OuterLoop;
-                }
-            }
-            if (bullet.getY()+bullet.getHeight()<0){
-                bulletsToRemove.add(bullet);
-            }
-
-        }
-        List<Bullet> newBullets = player.getBullets();
-        newBullets.removeAll(bulletsToRemove);
-        player.setBullets(newBullets);
-        return mobsToRemove;
-    }
 
     private List<Mob> checkPlayerCollision(List<Mob> mobs){
         ArrayList<Mob> mobsToRemove = new ArrayList<>();
@@ -472,10 +440,12 @@ public class Content extends JPanel implements KeyListener {
                     updateExplosions();
                     updateMeteors();
                     updateEnemySpaceShips();
-                    this.meteors.removeAll(checkBulletsCollision(new ArrayList<Mob>(meteors),100));
+                    updateBoosts();
+                    this.meteors.removeAll(checkBulletsCollision(new ArrayList<Mob>(meteors),100,10));
                     this.meteors.removeAll(checkPlayerCollision(new ArrayList<Mob>(meteors)));
-                    this.enemySpaceShips.removeAll(checkBulletsCollision(new ArrayList<Mob>(enemySpaceShips),200));
+                    this.enemySpaceShips.removeAll(checkBulletsCollision(new ArrayList<Mob>(enemySpaceShips),200,2));
                     this.enemySpaceShips.removeAll(checkPlayerCollision(new ArrayList<Mob>(enemySpaceShips)));
+                    checkPlayerBoostCollision();
                     for (EnemySpaceShip enemySpaceShip:enemySpaceShips){
                         ArrayList <EnemyBullets> newBullets = enemySpaceShip.getEnemyBullets();
                         newBullets.removeAll(checkPlayerCollision(new ArrayList<Mob>(newBullets)));
@@ -544,5 +514,103 @@ public class Content extends JPanel implements KeyListener {
 //        }).start();
 
 //    }
+
+    private List<Mob> checkBulletsCollision(List<Mob> mobs, int pointsPerHit,int oneToHowMuchBoostChance){
+        ArrayList<Mob> mobsToRemove = new ArrayList<>();
+        ArrayList<Bullet> bulletsToRemove = new ArrayList<>();
+        OuterLoop:
+        for (Bullet bullet: player.getBullets()) {
+            Random random=new Random();
+            int num=random.nextInt(1,oneToHowMuchBoostChance);
+            for (Mob mob:mobs) {
+                Rectangle mobRectangle = new Rectangle(
+                        mob.getX() - mob.getWidth() / 2,
+                        mob.getY() - mob.getHeight() / 2,
+                        mob.getWidth(),
+                        mob.getHeight()-40
+                );
+                Rectangle bulletRectangle = new Rectangle(
+                        bullet.getX(),
+                        bullet.getY(),
+                        bullet.getWidth(),
+                        bullet.getHeight()
+                );
+                if (mobRectangle.intersects(bulletRectangle)) {
+                    mob.setLife(mob.getLife()-player.getBulletDamage());
+                    if(mob.getLife() <= 0){
+                        score += pointsPerHit;
+                        mobsToRemove.add(mob);
+                        explosions.add(new Explosion(mob.getX(), mob.getY()));
+                        if (num==1){
+                            int type=random.nextInt(1,5);
+                            Boost boost=new Boost(mob.getX(),mob.getY(),type,player);
+                            boolean exists = false;
+                            for (Boost b : boosts) {
+                                if (b.getX() == mob.getX() && b.getY() == mob.getY()) {
+                                    exists = true;
+                                    break;
+                                }
+                            }
+                            if (!exists&&!player.getBoostsThatAreOn()[type-1]) {
+                                boosts.add(boost);
+                            }
+                        }
+                    }
+                    bulletsToRemove.add(bullet);
+                    continue OuterLoop;
+                }
+            }
+            if (bullet.getY()+bullet.getHeight()<0){
+                bulletsToRemove.add(bullet);
+            }
+
+        }
+        List<Bullet> newBullets = player.getBullets();
+        newBullets.removeAll(bulletsToRemove);
+        player.setBullets(newBullets);
+        return mobsToRemove;
+    }
+
+    private void updateBoosts(){
+        ArrayList<Boost> boostsToRemove = new ArrayList<>();
+        for (Boost boost: this.boosts) {
+            if (boost.getY() > getHeight()) {
+                boostsToRemove.add(boost);
+            }
+            else {
+                boost.move();
+            }
+        }
+        boosts.removeAll(boostsToRemove);
+    }
+
+    private void checkPlayerBoostCollision(){
+        Rectangle playerRectangle=new Rectangle(
+                player.getX()+20,
+                player.getY()+20,
+                player.getWidth()-40,
+                player.getHeight()-50
+        );
+        for (Boost boost:boosts) {
+            Rectangle boostRectangle = new Rectangle(
+                    boost.getX() - boost.getWidth()/2,
+                    boost.getY() - boost.getHeight()/2,
+                    boost.getWidth(),
+                    boost.getHeight()
+            );
+            if (boostRectangle.intersects(playerRectangle)){
+                boost.effect();
+                boosts.remove(boost);
+            }
+//            new Thread(()->{
+//                try{
+//                    Thread.sleep(3000);
+//                }
+//                catch (InterruptedException e){
+//                    e.printStackTrace();
+//                }
+//            }).start();
+        }
+    }
 
 }
