@@ -12,7 +12,6 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-
 public class Content extends JPanel implements KeyListener {
     private Image background, gameOver, heartFull, heartEmpty;
     private boolean isGameOver;
