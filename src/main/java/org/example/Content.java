@@ -226,6 +226,7 @@ public class Content extends JPanel implements KeyListener {
         this.add(goBackToMenu);
         this.remove(pauseButton);
         backGroundSound.stop();
+
     }
 
 
