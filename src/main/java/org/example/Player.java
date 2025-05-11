@@ -39,7 +39,7 @@ public class Player  {
         this.bulletWidth=40;
         this.bulletHeight=60;
         this.bulletDamage=1;
-
+        this.XP=1;
     }
 
     public void paint(Graphics graphics){

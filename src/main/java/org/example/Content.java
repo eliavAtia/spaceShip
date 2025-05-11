@@ -349,7 +349,7 @@ public class Content extends JPanel implements KeyListener {
     private void infiniteScoreAdd(){
         new Thread(()->{
             while (!isGameOver) {
-                score++;
+                score+=player.getHp();
                 try {
                     Thread.sleep(60);
                 } catch (InterruptedException e) {
