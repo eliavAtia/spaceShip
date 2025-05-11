@@ -3,10 +3,14 @@ package org.example;
 import javax.swing.*;
 
 import java.awt.*;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Objects;
 
 public class StartScreen extends JPanel {
-    private JButton StartButton, instructionsButton, leaderboardButton;
+    private JButton StartButton, instructionsButton, leaderboardButton, okButton;
+    private JTextField enterName;
+    private String playerName;
     private JPanel contentPanel;
     private Content game;
     private SoundPlayer backGroundMusic;
@@ -30,6 +34,7 @@ public class StartScreen extends JPanel {
         leaderboardButtonBuilder(Width,High);
         this.add(contentPanel);
         this.add(instructions);
+        textField();
     }
 
     private void backGroundBuilder(){
@@ -56,7 +61,6 @@ public class StartScreen extends JPanel {
         this.StartButton.setBounds((Width / 2) - (startButtonImage.getIconWidth() / 2), (High / 3) - (startButtonImage.getIconHeight() / 2)+50, 300, 70);
         this.StartButton.setContentAreaFilled(false);
         this.StartButton.setBorder(null);
-        this.contentPanel.add(StartButton); // דווקא CONTENT כי זה מוסיף רק לפאנל הזה כי אחר כך כשאני עושה REMOVE זה ימחק רק מפה
         this.StartButton.addActionListener((E) -> StartGame());
     }
 
@@ -66,8 +70,6 @@ public class StartScreen extends JPanel {
         this.instructionsButton.setBounds((Width / 2) - (startButtonImage.getIconWidth() / 2), (High / 3) - (instructionsButtonImage.getIconHeight() / 2) + (startButtonImage.getIconHeight() / (2) + 10)+50, 300, 70);
         this.instructionsButton.setContentAreaFilled(false);
         this.instructionsButton.setBorder(null);
-        this.contentPanel.add(instructionsButton);
-
         instructionsButton.addActionListener((E) -> {
             contentPanel.setVisible(false);
             instructions.setVisible(true);
@@ -95,7 +97,6 @@ public class StartScreen extends JPanel {
         this.leaderboardButton.setBounds((Width / 2) - (startButtonImage.getIconWidth() / 2), (High / 3) - (leaderboardButtonImage.getIconHeight() / 2) + (instructionsButtonImage.getIconHeight() * (2) / (2) + 10)+50, 300, 70);
         this.leaderboardButton.setContentAreaFilled(false);
         this.leaderboardButton.setBorder(null);
-        this.contentPanel.add(leaderboardButton);
     }
 
     private void StartGame() {
@@ -119,5 +120,39 @@ public class StartScreen extends JPanel {
         super.paintComponent(g);
         g.drawImage(Gif.getImage(), 0, 0, getWidth(), getHeight(), this);
         g.drawImage(nameImages.getImage(),getWidth()/2 - nameImages.getIconWidth()/2,70,nameImages.getIconWidth(),nameImages.getIconHeight(),this);
+    }
+
+    private void textField() {
+        enterName = new JTextField();
+        enterName.setBounds(getWidth()/2 - 200, getHeight()/2, 300, 40);
+        enterName.setFont(new Font("Ah  aroni", Font.PLAIN, 18));
+        enterName.setForeground(Color.white);// צבע טקסט
+        enterName.setOpaque(false);// צבע הרקע
+        enterName.setHorizontalAlignment(JTextField.CENTER);
+        contentPanel.add(enterName);
+        okButton = new JButton("OK");
+        okButton.setBounds(getWidth()/2+120, getHeight()/2, 80, 40);
+        okButton.addActionListener(e -> {
+            String name = enterName.getText();
+            if (name == null || name.trim().isEmpty() || name.equals("הכנס שם...")) {
+                JOptionPane.showMessageDialog(this, "אנא הכנס שם לפני התחלה");
+            } else {
+                try {
+                    FileWriter writer = new FileWriter("names.txt", true); // true = append mode
+                    writer.write(name.trim() + "\n");
+                    writer.close();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(this, "שגיאה בשמירת השם לקובץ.");
+                }
+                enterName.setVisible(false);
+                okButton.setVisible(false);
+                this.contentPanel.add(instructionsButton);
+                this.contentPanel.add(leaderboardButton);
+                this.contentPanel.add(StartButton);
+            }
+        });
+
+        contentPanel.add(okButton);
     }
 }
