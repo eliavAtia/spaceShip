@@ -2,6 +2,7 @@ package org.example;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Objects;
 
 public class Instructions extends JPanel {
     private StartScreen parentPanel;
@@ -15,9 +16,9 @@ public class Instructions extends JPanel {
         // שמירה על הפאנל הקודם
         this.parentPanel = parentPanel;
 
-        backgroundImage = new ImageIcon(getClass().getResource("/Images/מגילה GIF 2.gif"));
+        backgroundImage = new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/מגילה GIF 2.gif")));
 
-        ImageIcon exitIcon = new ImageIcon(getClass().getResource("/Images/exit.png"));
+        ImageIcon exitIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/exit.png")));
         exitIcon.setImage(exitIcon.getImage().getScaledInstance(50,30,Image.SCALE_SMOOTH));
 
         JButton close = new JButton(exitIcon);

@@ -7,10 +7,11 @@ public class Main {
         JFrame window=new JFrame("space nigga");
 //        UserManager userManager= new UserManager(0,0,200,1000);
 //        window.add(userManager);
-        StartScreen startScreen = new StartScreen(0,0,WINDOW_WIDTH,WINDOW_HEIGHT);
+        window.setResizable(false);
+        StartScreen startScreen = new StartScreen(window, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
         window.setContentPane(startScreen);
         window.setSize(WINDOW_WIDTH,WINDOW_HEIGHT);
-        window.setResizable(true);
+        window.setResizable(false);
         window.setLocationRelativeTo(null);
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         ImageIcon icon = new ImageIcon(Main.class.getResource("/Images/sSpaceShip.png"));
@@ -18,6 +19,5 @@ public class Main {
         window.setLayout(null);
         window.setVisible(true);
 
-//        window.setResizable(false);
     }
 }
