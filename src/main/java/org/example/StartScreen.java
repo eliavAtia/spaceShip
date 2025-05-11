@@ -29,7 +29,7 @@ public class StartScreen extends JPanel {
         instructionsButtonBuilder(Width,High);
         leaderboardButtonBuilder(Width,High);
         this.add(contentPanel);
-        this.add(instructions); // חשוב שזה יופיע אחרי contentPanel כדי להיות מעליו
+        this.add(instructions);
     }
 
     private void backGroundBuilder(){
@@ -100,17 +100,16 @@ public class StartScreen extends JPanel {
 
     private void StartGame() {
         backGroundMusic.stop();
-        game = new Content(0, 0, frame.getWidth(), frame.getHeight());
+        game = new Content(frame,0, 0, frame.getWidth(), frame.getHeight(),this);
         frame.setContentPane(game);
-        frame.setResizable(true);
         frame.revalidate();
         frame.repaint();
         game.requestFocusInWindow();
     }
 
     public void returnToPreviousPanel() {
-        contentPanel.setVisible(true);  // מציג את contentPanel מחדש
-        instructions.setVisible(false);  // מסתיר את ההוראות
+        contentPanel.setVisible(true);
+        instructions.setVisible(false);
         this.revalidate();
         this.repaint();
     }
@@ -119,6 +118,6 @@ public class StartScreen extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         g.drawImage(Gif.getImage(), 0, 0, getWidth(), getHeight(), this);
-        g.drawImage(nameImages.getImage(),30,20,300,40,this);
+        g.drawImage(nameImages.getImage(),getWidth()/2 - nameImages.getIconWidth()/2,70,nameImages.getIconWidth(),nameImages.getIconHeight(),this);
     }
 }
