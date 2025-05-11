@@ -33,7 +33,7 @@ public class StartScreen extends JPanel {
     }
 
     private void backGroundBuilder(){
-        backGroundMusic = new SoundPlayer("/Sounds/RICK_AND_MORTY.wav");
+        backGroundMusic = new SoundPlayer("/Sounds/RICK_AND_MORTme.wav");
         backGroundMusic.playLoop();
         Gif = new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/space 4K gif.gif")));
     }
@@ -73,7 +73,7 @@ public class StartScreen extends JPanel {
             instructions.setVisible(true);
             new Thread(() -> {
                 try {
-                    Thread.sleep(1200); // השהיה של 2000 מילישניות = 2 שניות
+                    Thread.sleep(1000); // השהיה של 2000 מילישניות = 2 שניות
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

@@ -32,7 +32,7 @@ public class Instructions extends JPanel {
 
 
     public void changePhotoBackground(){
-        backgroundImage = new ImageIcon(getClass().getResource("/Images/scroll last frame.gif"));
+        backgroundImage = new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/scroll last frame.gif")));
     }
 
     public void Text() {
