@@ -85,4 +85,16 @@ public class Mob {
         this.gotHit=true;
         startFlashingEffect();
     }
+
+    public void setShouldDrawMobImage(boolean shouldDrawMobImage) {
+        this.shouldDrawMobImage = shouldDrawMobImage;
+    }
+
+    public boolean isGotHit() {
+        return gotHit;
+    }
+
+    public void setGotHit(boolean gotHit) {
+        this.gotHit = gotHit;
+    }
 }

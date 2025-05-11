@@ -15,7 +15,7 @@ public class Player  {
     private Image image1,image2,image3;
     private boolean rightPressed,leftPressed,upPressed,downPressed,spacePressed;
     private int hp;
-    SoundPlayer lasers=new SoundPlayer("/Sounds/laserSound.wav");
+    private SoundPlayer lasers=new SoundPlayer("/Sounds/laserSound.wav");
     private boolean shieldOn;
     private boolean shouldDrawPlayerImage = true;
     private List<Bullet> bullets;
@@ -23,8 +23,7 @@ public class Player  {
     private int bulletWidth,bulletHeight;
     private int bulletDamage;
     private int XP;
-
-
+    private boolean[] boostsThatAreOn;
     public Player(int x,int y,int width,int height){
         this.x=x;
         this.y=y;
@@ -40,6 +39,7 @@ public class Player  {
         this.bulletHeight=60;
         this.bulletDamage=1;
         this.XP=1;
+        this.boostsThatAreOn=new boolean[4];
     }
 
     public void paint(Graphics graphics){
@@ -110,13 +110,13 @@ public class Player  {
 
     public Bullet shootRight(){
         lasers.playSound();
-        return new Bullet(x+width -45,y,40,60,this.bulletDamage);
+        return new Bullet(x+width -45,y,bulletWidth,bulletHeight,this.bulletDamage);
 
     }
 
     public Bullet shootLeft(){
         lasers.playSound();
-        return new Bullet(x+8,y,40,60,this.bulletDamage);
+        return new Bullet(x+3,y,bulletWidth,bulletHeight,this.bulletDamage);
     }
 
     public int getHp(){
@@ -289,5 +289,21 @@ public class Player  {
 
     public void setBulletDamage(int bulletDamage) {
         this.bulletDamage = bulletDamage;
+    }
+
+    public int getXP() {
+        return XP;
+    }
+
+    public void setXP(int XP) {
+        this.XP = XP;
+    }
+
+    public boolean[] getBoostsThatAreOn() {
+        return boostsThatAreOn;
+    }
+
+    public void setBoostsThatAreOn(boolean[] boostsThatAreOn) {
+        this.boostsThatAreOn = boostsThatAreOn;
     }
 }
