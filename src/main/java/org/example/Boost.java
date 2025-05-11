@@ -129,7 +129,8 @@ public class Boost{
         this.y = y;
     }
 
-//    private java.util.List<Mob> checkBulletsCollision(java.util.List<Mob> mobs, int pointsPerHit, int oneToHowMuchBoostChance){
+
+//    private List<Mob> checkBulletsCollision(List<Mob> mobs, int pointsPerHit,int oneToHowMuchBoostChance){
 //        ArrayList<Mob> mobsToRemove = new ArrayList<>();
 //        ArrayList<Bullet> bulletsToRemove = new ArrayList<>();
 //        OuterLoop:
@@ -150,7 +151,7 @@ public class Boost{
 //                        bullet.getHeight()
 //                );
 //                if (mobRectangle.intersects(bulletRectangle)) {
-//                    mob.mobHit();
+//                    mob.setLife(mob.getLife()-player.getBulletDamage());
 //                    if(mob.getLife() <= 0){
 //                        score += pointsPerHit;
 //                        mobsToRemove.add(mob);
@@ -165,7 +166,7 @@ public class Boost{
 //                                    break;
 //                                }
 //                            }
-//                            if (!exists) {
+//                            if (!exists&&!player.getBoostsThatAreOn()[type-1]) {
 //                                boosts.add(boost);
 //                            }
 //                        }
@@ -183,5 +184,57 @@ public class Boost{
 //        newBullets.removeAll(bulletsToRemove);
 //        player.setBullets(newBullets);
 //        return mobsToRemove;
+//    }
+
+
+
+//    for (int i = 1; i < player.getBoostsThatAreOn().length; i++) {
+//        if (player.getBoostsThatAreOn()[i]){
+//            g.drawImage(new Boost(0,0,i+1,player).getImage(),20+(i-1)*40,100,30,30,null);
+//        }
+//    }
+
+
+//    private void updateBoosts(){
+//        ArrayList<Boost> boostsToRemove = new ArrayList<>();
+//        for (Boost boost: this.boosts) {
+//            if (boost.getY() > getHeight()) {
+//                boostsToRemove.add(boost);
+//            }
+//            else {
+//                boost.move();
+//            }
+//        }
+//        boosts.removeAll(boostsToRemove);
+//    }
+
+
+//    private void checkPlayerBoostCollision(){
+//        Rectangle playerRectangle=new Rectangle(
+//                player.getX()+20,
+//                player.getY()+20,
+//                player.getWidth()-40,
+//                player.getHeight()-50
+//        );
+//        for (Boost boost:boosts) {
+//            Rectangle boostRectangle = new Rectangle(
+//                    boost.getX() - boost.getWidth()/2,
+//                    boost.getY() - boost.getHeight()/2,
+//                    boost.getWidth(),
+//                    boost.getHeight()
+//            );
+//            if (boostRectangle.intersects(playerRectangle)){
+//                boost.effect();
+//                boosts.remove(boost);
+//            }
+////            new Thread(()->{
+////                try{
+////                    Thread.sleep(3000);
+////                }
+////                catch (InterruptedException e){
+////                    e.printStackTrace();
+////                }
+////            }).start();
+//        }
 //    }
 }
