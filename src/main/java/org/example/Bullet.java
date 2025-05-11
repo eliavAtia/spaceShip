@@ -9,13 +9,15 @@ public class Bullet {
     private int width;
     private int height;
     private Image image;
+    private int damage;
 
-    public Bullet(int x, int y, int width, int height){
+    public Bullet(int x, int y, int width, int height,int damage){
         this.x=x;
         this.y=y;
         this.width=width;
         this.height=height;
         this.image= new ImageIcon(getClass().getResource("/Images/laser.png")).getImage();
+        this.damage=damage;
     }
 
     public void draw(Graphics g){

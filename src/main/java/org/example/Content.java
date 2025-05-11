@@ -18,14 +18,13 @@ public class Content extends JPanel implements KeyListener {
     private SoundPlayer gameOverSound;
     private int score;
     private Player player;
-    private List<Bullet> bullets;
     private List<Meteor> meteors;
     private List<Explosion> explosions;
     private List<EnemySpaceShip> enemySpaceShips;
     private List<Boss> bosses;
-    private long lastMeteorSpawnTime = 0, lastBulletSpawnTime = 0;
+    private long lastMeteorSpawnTime = 0;
     private boolean rightPressed,leftPressed,upPressed,downPressed,spacePressed;
-    private static final long METEOR_SPAWN_DELAY = 1500,BULLET_SPAWN_DELAY = 300;
+    private static final long METEOR_SPAWN_DELAY = 1500;
     private JLabel scoreLabel;
     private static Font customFont;
 //    private boolean boss1Defeated,boss3Defeated,boss2Defeated, bossActivated;
@@ -37,6 +36,7 @@ public class Content extends JPanel implements KeyListener {
         this.setFocusable(true);
         this.requestFocusInWindow();
         this.addKeyListener(this);
+        this.setLayout(null);
         player = new Player(width / 2, height / 2, 80, 80);
         mobBuilder();
         scoreBuilder();
@@ -55,7 +55,6 @@ public class Content extends JPanel implements KeyListener {
     private void mobBuilder(){
         this.bosses = new CopyOnWriteArrayList<>();
         this.meteors = new CopyOnWriteArrayList<>();
-        this.bullets = new CopyOnWriteArrayList<>();
         this.explosions = new CopyOnWriteArrayList<>();
         this.enemySpaceShips=new CopyOnWriteArrayList<>();
     }
@@ -84,9 +83,6 @@ public class Content extends JPanel implements KeyListener {
         g.drawImage(background, 0, 0, getWidth(), getHeight(), this);
         if (!this.isGameOver) {
             this.player.paint(g);
-            for (Bullet b: bullets){
-                b.draw(g);
-            }
             for (Explosion explosion : explosions) {
                 explosion.paint(g);
             }
@@ -153,6 +149,7 @@ public class Content extends JPanel implements KeyListener {
         }
         if (e.getKeyCode()==KeyEvent.VK_SPACE){
             spacePressed=true;
+            this.player.setSpacePressed(spacePressed);
         }
     }
 
@@ -176,6 +173,7 @@ public class Content extends JPanel implements KeyListener {
         }
         if (e.getKeyCode()==KeyEvent.VK_SPACE){
             spacePressed=false;
+            this.player.setSpacePressed(spacePressed);
         }
     }
 
@@ -207,24 +205,6 @@ public class Content extends JPanel implements KeyListener {
         }).start();
     }
 
-    private void updateBullets(){
-        long now = System.currentTimeMillis();
-        ArrayList<Bullet> bulletsToRemove = new ArrayList<>();
-        for (Bullet b:bullets) {
-            if (b.getY() < 0) {
-                bulletsToRemove.add(b);
-            }
-            else {
-                b.move();
-            }
-        }
-        bullets.removeAll(bulletsToRemove);
-        if (spacePressed &&( now - lastBulletSpawnTime >= BULLET_SPAWN_DELAY)) {
-            bullets.add(player.shootRight());
-            bullets.add(player.shootLeft());
-            lastBulletSpawnTime = now;
-        }
-    }
 
     private void createNewMeteor(){
         Random random = new Random();
@@ -263,7 +243,7 @@ public class Content extends JPanel implements KeyListener {
         ArrayList<Mob> mobsToRemove = new ArrayList<>();
         ArrayList<Bullet> bulletsToRemove = new ArrayList<>();
         OuterLoop:
-        for (Bullet bullet: bullets) {
+        for (Bullet bullet: player.getBullets()) {
             for (Mob mob:mobs) {
                 Rectangle mobRectangle = new Rectangle(
                         mob.getX() - mob.getWidth() / 2,
@@ -293,7 +273,9 @@ public class Content extends JPanel implements KeyListener {
             }
 
         }
-        bullets.removeAll(bulletsToRemove);
+        List<Bullet> newBullets = player.getBullets();
+        newBullets.removeAll(bulletsToRemove);
+        player.setBullets(newBullets);
         return mobsToRemove;
     }
 
@@ -381,7 +363,7 @@ public class Content extends JPanel implements KeyListener {
         final int[] enemyRespawn = {2000};
         new Thread(() -> {
             while (!isGameOver) {
-                updateBullets();
+                player.updateBullets();
                 updateExplosions();
                 updateMeteors();
                 updateEnemySpaceShips();
