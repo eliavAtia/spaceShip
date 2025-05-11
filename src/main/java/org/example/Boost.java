@@ -29,7 +29,7 @@ public class Boost{
             return;
         }
         switch (type){
-            case 1: if (player.getMaxHp()==player.getHp()) {
+            case 1: if (player.getMaxHp()!=player.getHp()) {
                 player.setHp(player.getHp() + 1);
                 break;
             }
