@@ -31,8 +31,7 @@ public class Boost{
         switch (type){
             case 1: if (player.getMaxHp()!=player.getHp()) {
                 player.setHp(player.getHp() + 1);
-                break;
-            }
+            }break;
             case 2: player.setBulletHeight(player.getBulletHeight()*2);
                     player.setBulletWidth(player.getBulletWidth()*2);
                     player.setBulletDamage(player.getBulletDamage()*2);
