@@ -414,7 +414,6 @@ public class Content extends JPanel implements KeyListener {
     }
 
 
-
     //game course
     private void infiniteScoreAdd(){
         scoreThread=new Thread(()->{
@@ -441,7 +440,7 @@ public class Content extends JPanel implements KeyListener {
                     updateMeteors();
                     updateEnemySpaceShips();
                     updateBoosts();
-                    this.meteors.removeAll(checkBulletsCollision(new ArrayList<Mob>(meteors),100,10));
+                    this.meteors.removeAll(checkBulletsCollision(new ArrayList<Mob>(meteors),100,6));
                     this.meteors.removeAll(checkPlayerCollision(new ArrayList<Mob>(meteors)));
                     this.enemySpaceShips.removeAll(checkBulletsCollision(new ArrayList<Mob>(enemySpaceShips),200,2));
                     this.enemySpaceShips.removeAll(checkPlayerCollision(new ArrayList<Mob>(enemySpaceShips)));
