@@ -124,7 +124,7 @@ public class StartScreen extends JPanel {
     private void textField() {
         enterName = new JTextField();
         enterName.setBounds(getWidth()/2 - 200, getHeight()/2, 300, 40);
-        enterName.setFont(new Font("Ah  aroni", Font.PLAIN, 18));
+        enterName.setFont(new Font("Aharoni", Font.PLAIN, 18));
         enterName.setForeground(Color.white);// צבע טקסט
         enterName.setOpaque(false);// צבע הרקע
         enterName.setHorizontalAlignment(JTextField.CENTER);
@@ -133,7 +133,7 @@ public class StartScreen extends JPanel {
         okButton.setBounds(getWidth()/2+120, getHeight()/2, 80, 40);
         okButton.addActionListener(e -> {
             String name = enterName.getText();
-            if (name == null || name.trim().isEmpty() || name.equals("הכנס שם...")) {
+            if (name == null || name.trim().isEmpty()) {
                 JOptionPane.showMessageDialog(this, "אנא הכנס שם לפני התחלה");
             } else {
                 try {
