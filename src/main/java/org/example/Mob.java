@@ -80,8 +80,8 @@ public class Mob {
         this.image = image;
     }
 
-    public void mobHit(){
-        this.life--;
+    public void mobHit(int damage){
+        this.life-=damage;
         this.gotHit=true;
         startFlashingEffect();
     }
