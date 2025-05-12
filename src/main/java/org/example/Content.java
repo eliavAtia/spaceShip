@@ -34,13 +34,16 @@ public class Content extends JPanel implements KeyListener {
     private JFrame frame;
     private Thread directionThread,scoreThread,actionThread;
     private List<Boost> boosts;
+    private String playerName;
+    private Leaderboard leaderboard;
 //    private boolean boss1Defeated,boss3Defeated,boss2Defeated, bossActivated;
 
 
 
     //builders
-    public Content(JFrame frame, int x, int y, int width, int height, StartScreen parentPanel) {
+    public Content(String playerName,JFrame frame, int x, int y, int width, int height, StartScreen parentPanel) {
         this.setBounds(x, y, width, height);
+        this.playerName=playerName;
         imageSoundBuilder();
         this.frame = frame;
         setFocusable(true);
@@ -50,6 +53,7 @@ public class Content extends JPanel implements KeyListener {
         player = new Player(width / 2, height / 2, 80, 80);
         mobBuilder();
         scoreBuilder();
+        leaderboardBuilder();
         gameCourse();
         goBackToMenuButtonBuilder(parentPanel);
         pauseButtonBuilder();
@@ -93,6 +97,12 @@ public class Content extends JPanel implements KeyListener {
         this.scoreLabel.setBounds(20, 65, 500, 30);
         scoreLabel.setForeground(new Color(243, 202, 0));
         this.add(scoreLabel);
+    }
+
+    private void leaderboardBuilder(){
+        Leaderboard leaderboard = new Leaderboard(); // GameScreen
+        leaderboard.loadFromFile();
+        leaderboard.addScore(playerName, this.score);
     }
 
     private void goBackToMenuButtonBuilder(StartScreen parentPanel){
@@ -220,6 +230,7 @@ public class Content extends JPanel implements KeyListener {
         g.setFont(Content.customFont.deriveFont(32f));
         g.setColor(Color.WHITE);
         String scoreText = "Your Score: " + score;
+        leaderboard.addScore(this.playerName,this.score);
         int textWidth = g.getFontMetrics().stringWidth(scoreText);
         g.drawString(scoreText, this.getWidth() / 2 - textWidth / 2, this.getHeight() / 2 + 100);
         scoreLabel.setVisible(false);
@@ -621,7 +632,7 @@ public class Content extends JPanel implements KeyListener {
 
 //    }
 
-
-
-
+    public Leaderboard getLeaderboard(){
+        return this.leaderboard;
+    }
 }
