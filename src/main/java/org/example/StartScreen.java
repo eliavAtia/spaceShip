@@ -20,19 +20,40 @@ public class StartScreen extends JPanel {
     private final ImageIcon leaderboardButtonImage = new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/__LEADERBOARDS_-_עותק-removebg-preview.png")));
     private final ImageIcon nameImages = new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/Cool Text - space NIgga 482251320904050.png")));
     private final JFrame frame;
+    private String currentPlayerName;// StartScreen
+    private LeaderBoardsFrame leaderBoardsFrame;
+    private Leaderboard leaderboard;
 
     public StartScreen(JFrame frame, int x, int y, int Width, int High) {
         this.frame = frame;
         this.setBounds(x, y, Width, High);
         setLayout(null);
+
+        // רקע ומוזיקה
         backGroundBuilder();
-        contentBuilder(Width,High);
-        instructionsBuilder(Width,High);
-        startButtonBuilder(Width,High);
-        instructionsButtonBuilder(Width,High);
-        leaderboardButtonBuilder(Width,High);
+
+        // יצירת לוח ניקוד וטעינה מקובץ
+        leaderboard = new Leaderboard();
+        try {
+            leaderboard.loadFromFile(); // טוען ניקוד מקובץ (אם קיים)
+        } catch (Exception e) {
+            System.out.println("לא נטען לוח ניקוד - נתחיל חדש.");
+        }
+
+        // בניית רכיבים גרפיים
+        contentBuilder(Width, High);
+        instructionsBuilder(Width, High);
+        startButtonBuilder(Width, High);
+        leaderboardsBuilder(Width, High); // עכשיו יש לנו Leaderboard מאותחל
+        instructionsButtonBuilder(Width, High);
+        leaderboardButtonBuilder(Width, High);
+
+        // הוספה למסך
         this.add(contentPanel);
         this.add(instructions);
+        this.add(leaderBoardsFrame);
+
+        // שדה טקסט להזנת שם שחקן
         textField();
     }
 
@@ -48,6 +69,10 @@ public class StartScreen extends JPanel {
         contentPanel.setLayout(null);
         contentPanel.setOpaque(false);
     }
+    private void leaderboardsBuilder(int Width,int High){
+        this.leaderBoardsFrame=new LeaderBoardsFrame(leaderboard,getWidth()/2,getHeight()/2);
+        this.leaderBoardsFrame.setVisible(false);
+    }
 
     private void instructionsBuilder(int Width, int High){
         this.instructions = new Instructions(0, 0, Width, High, this);
@@ -57,7 +82,7 @@ public class StartScreen extends JPanel {
     private void startButtonBuilder(int Width, int High){
         this.startButtonImage.setImage(this.startButtonImage.getImage().getScaledInstance(375, 175, Image.SCALE_SMOOTH));
         this.StartButton = new JButton(startButtonImage);
-        this.StartButton.setBounds((Width / 2) - (startButtonImage.getIconWidth() / 2), (High / 3) - (startButtonImage.getIconHeight() / 2)+50, 300, 70);
+        this.StartButton.setBounds((Width / 2) - (startButtonImage.getIconWidth() / 2), (High / 3) - (startButtonImage.getIconHeight() / 2)+100, 300, 70);
         this.StartButton.setContentAreaFilled(false);
         this.StartButton.setBorder(null);
         this.StartButton.addActionListener((E) -> StartGame());
@@ -66,7 +91,7 @@ public class StartScreen extends JPanel {
     private void instructionsButtonBuilder(int Width, int High){
         this.instructionsButtonImage.setImage(this.instructionsButtonImage.getImage().getScaledInstance(375, 175, Image.SCALE_SMOOTH));
         this.instructionsButton = new JButton(instructionsButtonImage);
-        this.instructionsButton.setBounds((Width / 2) - (startButtonImage.getIconWidth() / 2), (High / 3) - (instructionsButtonImage.getIconHeight() / 2) + (startButtonImage.getIconHeight() / (2) + 10)+50, 300, 70);
+        this.instructionsButton.setBounds((Width / 2) - (startButtonImage.getIconWidth() / 2), (High / 3) - (instructionsButtonImage.getIconHeight() / 2)+20+(instructionsButtonImage.getIconHeight()) , 300, 70);
         this.instructionsButton.setContentAreaFilled(false);
         this.instructionsButton.setBorder(null);
         instructionsButton.addActionListener((E) -> {
@@ -93,14 +118,30 @@ public class StartScreen extends JPanel {
     private void leaderboardButtonBuilder(int Width, int High){
         this.leaderboardButtonImage.setImage(this.leaderboardButtonImage.getImage().getScaledInstance(375, 175, Image.SCALE_SMOOTH));
         this.leaderboardButton = new JButton(leaderboardButtonImage);
-        this.leaderboardButton.setBounds((Width / 2) - (startButtonImage.getIconWidth() / 2), (High / 3) - (leaderboardButtonImage.getIconHeight() / 2) + (instructionsButtonImage.getIconHeight() * (2) / (2) + 10)+50, 300, 70);
+        this.leaderboardButton.setBounds((Width / 2) - (startButtonImage.getIconWidth() / 2), (High / 3) - (instructionsButtonImage.getIconHeight() / 2)+(leaderboardButtonImage.getIconHeight())+110, 300, 70);
         this.leaderboardButton.setContentAreaFilled(false);
         this.leaderboardButton.setBorder(null);
+        leaderboardButton.addActionListener((E)->{
+            contentPanel.setVisible(false);
+            leaderBoardsFrame.setVisible(true);
+            new Thread(()->{
+                try{
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                SwingUtilities.invokeLater(()->{
+                    leaderBoardsFrame.setVisible(true);
+                });
+            }).start();
+                this.revalidate();
+                this.repaint();
+        });
     }
 
     private void StartGame() {
+        this.game=new Content(currentPlayerName,frame,0,0,getWidth(),getHeight(),this);
         backGroundMusic.stop();
-        game = new Content(frame,0, 0, frame.getWidth(), frame.getHeight(),this);
         frame.setContentPane(game);
         frame.revalidate();
         frame.repaint();
@@ -124,7 +165,7 @@ public class StartScreen extends JPanel {
     private void textField() {
         enterName = new JTextField();
         enterName.setBounds(getWidth()/2 - 200, getHeight()/2, 300, 40);
-        enterName.setFont(new Font("Ah  aroni", Font.PLAIN, 18));
+        enterName.setFont(new Font("Aharoni", Font.PLAIN, 18));
         enterName.setForeground(Color.white);// צבע טקסט
         enterName.setOpaque(false);// צבע הרקע
         enterName.setHorizontalAlignment(JTextField.CENTER);
@@ -133,9 +174,11 @@ public class StartScreen extends JPanel {
         okButton.setBounds(getWidth()/2+120, getHeight()/2, 80, 40);
         okButton.addActionListener(e -> {
             String name = enterName.getText();
-            if (name == null || name.trim().isEmpty() || name.equals("הכנס שם...")) {
+            if (name == null || name.trim().isEmpty()) {
                 JOptionPane.showMessageDialog(this, "אנא הכנס שם לפני התחלה");
             } else {
+                currentPlayerName = name.trim(); // StartScreen
+
                 try {
                     FileWriter writer = new FileWriter("names.txt", true); // true = append mode
                     writer.write(name.trim() + "\n");
