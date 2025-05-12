@@ -36,6 +36,7 @@ public class Content extends JPanel implements KeyListener {
     private List<Boost> boosts;
     private String playerName;
     private Leaderboard leaderboard;
+    private boolean isSaved;
 //    private boolean boss1Defeated,boss3Defeated,boss2Defeated, bossActivated;
 
 
@@ -59,6 +60,7 @@ public class Content extends JPanel implements KeyListener {
         pauseButtonBuilder();
         this.add(pauseButton);
         backGroundSound.playLoop();
+        leaderboard=new Leaderboard();
     }
 
     private void imageSoundBuilder(){
@@ -230,7 +232,6 @@ public class Content extends JPanel implements KeyListener {
         g.setFont(Content.customFont.deriveFont(32f));
         g.setColor(Color.WHITE);
         String scoreText = "Your Score: " + score;
-        leaderboard.addScore(this.playerName,this.score);
         int textWidth = g.getFontMetrics().stringWidth(scoreText);
         g.drawString(scoreText, this.getWidth() / 2 - textWidth / 2, this.getHeight() / 2 + 100);
         scoreLabel.setVisible(false);
@@ -430,6 +431,10 @@ public class Content extends JPanel implements KeyListener {
             if (player.getHp()<=0){
                 this.isGameOver=true;
                 gameOverSound.playSound();
+                if (!isSaved){
+                    this.leaderboard.addScore(this.playerName,this.score);
+                    isSaved=true;
+                }
             }
             new Thread(()->{
                 try{

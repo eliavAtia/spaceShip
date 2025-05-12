@@ -140,6 +140,7 @@ public class StartScreen extends JPanel {
     }
 
     private void StartGame() {
+        this.game=new Content(currentPlayerName,frame,0,0,getWidth(),getHeight(),this);
         backGroundMusic.stop();
         frame.setContentPane(game);
         frame.revalidate();
