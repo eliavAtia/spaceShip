@@ -390,7 +390,8 @@ public class Content extends JPanel implements KeyListener {
     }
 
 
-    //collision
+
+    //collisions
     private List<Mob> checkPlayerCollision(List<Mob> mobs){
         ArrayList<Mob> mobsToRemove = new ArrayList<>();
         Rectangle playerRectangle=new Rectangle(
@@ -454,7 +455,7 @@ public class Content extends JPanel implements KeyListener {
                         bullet.getHeight()
                 );
                 if (mobRectangle.intersects(bulletRectangle)) {
-                    mob.setLife(mob.getLife()-player.getBulletDamage());
+                    mob.mobHit(player.getBulletDamage());
                     if(mob.getLife() <= 0){
                         score += pointsPerHit;
                         mobsToRemove.add(mob);

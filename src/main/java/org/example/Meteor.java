@@ -27,11 +27,12 @@ public class Meteor extends Mob{
 
 
     public void paint(Graphics g) {
-        if(isShouldDrawMobImage())
-        if (image != null) {
-            g.drawImage(image, getX() - getWidth()/2, getY() - getHeight()/2, getWidth(), getHeight(), null);
-        } else {
-            g.fillOval(getX() - getWidth()/2, getY() - getHeight()/2, getWidth(), getHeight());
+        if(isShouldDrawMobImage()) {
+            if (image != null) {
+                g.drawImage(image, getX() - getWidth() / 2, getY() - getHeight() / 2, getWidth(), getHeight(), null);
+            } else {
+                g.fillOval(getX() - getWidth() / 2, getY() - getHeight() / 2, getWidth(), getHeight());
+            }
         }
     }
 

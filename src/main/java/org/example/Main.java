@@ -10,7 +10,6 @@ public class Main {
         Dimension screenSize = toolkit.getScreenSize();
         window.setSize(screenSize.width, screenSize.height);
         window.setExtendedState(JFrame.MAXIMIZED_BOTH);
-
         window.setResizable(false);
         window.setLocationRelativeTo(null);
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
