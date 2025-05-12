@@ -57,7 +57,7 @@ public class StartScreen extends JPanel {
     private void startButtonBuilder(int Width, int High){
         this.startButtonImage.setImage(this.startButtonImage.getImage().getScaledInstance(375, 175, Image.SCALE_SMOOTH));
         this.StartButton = new JButton(startButtonImage);
-        this.StartButton.setBounds((Width / 2) - (startButtonImage.getIconWidth() / 2), (High / 3) - (startButtonImage.getIconHeight() / 2)+50, 300, 70);
+        this.StartButton.setBounds((Width / 2) - (startButtonImage.getIconWidth() / 2), (High / 3) - (startButtonImage.getIconHeight() / 2)+100, 300, 70);
         this.StartButton.setContentAreaFilled(false);
         this.StartButton.setBorder(null);
         this.StartButton.addActionListener((E) -> StartGame());
@@ -66,7 +66,7 @@ public class StartScreen extends JPanel {
     private void instructionsButtonBuilder(int Width, int High){
         this.instructionsButtonImage.setImage(this.instructionsButtonImage.getImage().getScaledInstance(375, 175, Image.SCALE_SMOOTH));
         this.instructionsButton = new JButton(instructionsButtonImage);
-        this.instructionsButton.setBounds((Width / 2) - (startButtonImage.getIconWidth() / 2), (High / 3) - (instructionsButtonImage.getIconHeight() / 2) + (startButtonImage.getIconHeight() / (2) + 10)+50, 300, 70);
+        this.instructionsButton.setBounds((Width / 2) - (startButtonImage.getIconWidth() / 2), (High / 3) - (instructionsButtonImage.getIconHeight() / 2)+20+(instructionsButtonImage.getIconHeight()) , 300, 70);
         this.instructionsButton.setContentAreaFilled(false);
         this.instructionsButton.setBorder(null);
         instructionsButton.addActionListener((E) -> {
@@ -93,7 +93,7 @@ public class StartScreen extends JPanel {
     private void leaderboardButtonBuilder(int Width, int High){
         this.leaderboardButtonImage.setImage(this.leaderboardButtonImage.getImage().getScaledInstance(375, 175, Image.SCALE_SMOOTH));
         this.leaderboardButton = new JButton(leaderboardButtonImage);
-        this.leaderboardButton.setBounds((Width / 2) - (startButtonImage.getIconWidth() / 2), (High / 3) - (leaderboardButtonImage.getIconHeight() / 2) + (instructionsButtonImage.getIconHeight() * (2) / (2) + 10)+50, 300, 70);
+        this.leaderboardButton.setBounds((Width / 2) - (startButtonImage.getIconWidth() / 2), (High / 3) - (instructionsButtonImage.getIconHeight() / 2)+(leaderboardButtonImage.getIconHeight())+110, 300, 70);
         this.leaderboardButton.setContentAreaFilled(false);
         this.leaderboardButton.setBorder(null);
     }
