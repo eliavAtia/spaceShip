@@ -70,7 +70,7 @@ public class StartScreen extends JPanel {
         contentPanel.setOpaque(false);
     }
     private void leaderboardsBuilder(int Width,int High){
-        this.leaderBoardsFrame=new LeaderBoardsFrame(leaderboard,0,0,Width,High);
+        this.leaderBoardsFrame=new LeaderBoardsFrame(leaderboard,getWidth()/2,getHeight()/2);
         this.leaderBoardsFrame.setVisible(false);
     }
 
