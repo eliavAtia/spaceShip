@@ -2,46 +2,60 @@ package org.example;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
+import java.util.Objects;
 
 public class LeaderBoardsFrame extends JPanel {
     private final Image image;
-
-    public LeaderBoardsFrame(Leaderboard leaderboard, int x, int y) {
-        // קביעת גודל הפאנל
+    private static Font customFont;
+    private StartScreen parentPanel;
+    public LeaderBoardsFrame(Leaderboard leaderboard, int x, int y,StartScreen parentPanel) {
         image = new ImageIcon(getClass().getResource("/Images/leaderboard.png")).getImage();
-        int w = image.getWidth(this);
-        int h = image.getHeight(this);
-        setBounds(x-w,y-h/2, w, h);
+        int width = image.getWidth(this);
+        int height = image.getHeight(this);
+        this.parentPanel=parentPanel;
+        ImageIcon exitIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/exit.png")));
+        setBounds(x - width / 2, y - height / 2, width*2, height); // למרכז
 
-        // הגדרת Layout מתאים (FlowLayout במקרה זה)
-        setLayout(new BorderLayout());
+        setLayout(null); // מיקום ידני!
         setOpaque(false);
-        setBorder(null);
-
-
-        // טקסט
-        JTextArea textArea = new JTextArea();
-        textArea.setEditable(false);
-        textArea.setOpaque(false);
-        textArea.setBorder(null);
-        textArea.setForeground(Color.WHITE);
-        textArea.setFont(new Font("Arial", Font.BOLD, 18));
-        textArea.setFocusable(false);
-
-        StringBuilder sb = new StringBuilder();
+        try {
+            customFont = Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(getClass().getResourceAsStream("/fonts/PressStart2P-Regular.ttf"))).deriveFont(24f);
+            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            ge.registerFont(customFont);
+        } catch (IOException | FontFormatException e) {
+            e.printStackTrace();
+            customFont = new Font("Arial", Font.PLAIN, 24);
+        }
         leaderboard.loadFromFile();
-        leaderboard.getSortedScores().forEach(score -> sb.append(score.toString()).append("\n"));
-        textArea.setText(sb.toString());
+        java.util.List<PlayerScore> scores = leaderboard.getSortedScores();
 
-        // יצירת JScrollPane עם הטקסט
-        JScrollPane scrollPane = new JScrollPane(textArea);
-        scrollPane.setOpaque(false);
-        scrollPane.getViewport().setOpaque(false);
-        scrollPane.setBorder(null);
-        scrollPane.setFocusable(false);
+        int baseY = 198;      // נקודת התחלה של השורה הראשונה (לשנות לפי התמונה)
+        int rowHeight = 67;   // מרווח בין שורות (מדוד לפי העיצוב שלך)
 
-        // הוספת JScrollPane לפאנל
-        add(scrollPane, BorderLayout.CENTER);
+        for (int i = 0; i < 5; i++) {
+            String text=" ";
+            if (i < scores.size()) {
+                PlayerScore score = scores.get(i);
+                text =  score.toString();
+            }
+
+            JLabel scoreLabel = new JLabel(text);
+            scoreLabel.setForeground(Color.WHITE);
+            scoreLabel.setFont(new Font("Arial", Font.BOLD, 24));
+            scoreLabel.setFont(customFont);
+            scoreLabel.setBounds(130, baseY + i * rowHeight, 300, 33); // X, Y, רוחב, גובה
+            add(scoreLabel);
+        }
+        JButton close = new JButton(exitIcon);
+        close.setBounds(getWidth()/2-40, getHeight()-(getHeight()/10)*9+50, 30, 20); // מיקום כפתור "סגור"
+        close.addActionListener((e) -> {
+            parentPanel.remove(this);
+            parentPanel.returnToPreviousPanel();
+            parentPanel.revalidate();
+            parentPanel.repaint();
+        });
+        this.add(close);
     }
 
     @Override

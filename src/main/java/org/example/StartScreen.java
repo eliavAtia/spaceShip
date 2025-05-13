@@ -51,8 +51,6 @@ public class StartScreen extends JPanel {
         // הוספה למסך
         this.add(contentPanel);
         this.add(instructions);
-        this.add(leaderBoardsFrame);
-
         // שדה טקסט להזנת שם שחקן
         textField();
     }
@@ -70,8 +68,8 @@ public class StartScreen extends JPanel {
         contentPanel.setOpaque(false);
     }
     private void leaderboardsBuilder(int Width,int High){
-        this.leaderBoardsFrame=new LeaderBoardsFrame(leaderboard,getWidth()/2,getHeight()/2);
-        this.leaderBoardsFrame.setVisible(false);
+        this.leaderBoardsFrame=new LeaderBoardsFrame(leaderboard,getWidth()/2,getHeight()/2,this);
+        this.leaderBoardsFrame.setVisible(true);
     }
 
     private void instructionsBuilder(int Width, int High){
@@ -123,7 +121,7 @@ public class StartScreen extends JPanel {
         this.leaderboardButton.setBorder(null);
         leaderboardButton.addActionListener((E)->{
             contentPanel.setVisible(false);
-            leaderBoardsFrame.setVisible(true);
+            this.add(leaderBoardsFrame);
             new Thread(()->{
                 try{
                     Thread.sleep(1000);

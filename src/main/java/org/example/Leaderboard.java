@@ -7,9 +7,19 @@ public class Leaderboard {
     private static final String FILE_NAME = "leaderboard.dat";
 
     public void addScore(String name, int score) {
+        loadFromFile(); // טען קודם את הקיים
+        if (score==0){
+            return;
+        }
         scores.add(new PlayerScore(name, score));
-        saveToFile(); // שומר אחרי כל הוספה
+        Collections.sort(scores);
+        if (scores.size() > 5) {
+            scores = new ArrayList<>(scores.subList(0, 5));
+        }
+        saveToFile();
     }
+
+
 
     public void printLeaderboard() {
         Collections.sort(scores);
@@ -37,5 +47,4 @@ public class Leaderboard {
         Collections.sort(scores);
         return new ArrayList<>(scores); // מחזיר עותק ממויין
     }
-
 }

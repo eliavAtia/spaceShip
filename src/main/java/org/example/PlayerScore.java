@@ -27,7 +27,7 @@ public class PlayerScore implements Comparable<PlayerScore>, Serializable {
 
     @Override
     public String toString() {
-        return playerName + ": " + score;
+        return playerName + ":" + score;
     }
 }
 
