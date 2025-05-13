@@ -11,6 +11,13 @@ public class EnemySpaceShip extends Mob {
     private static final long SHOOT_SPAWN_DELAY = 1500;
     private boolean movingRight = true;
     private int maxHp;
+    public ArrayList<EnemyBullets> getEnemyBullets() {
+        return enemyBullets;
+    }
+    public void setEnemyBullets(ArrayList<EnemyBullets> enemyBullets) {
+        this.enemyBullets = enemyBullets;
+    }
+
 
 
     public EnemySpaceShip(int x, int y){
@@ -84,12 +91,7 @@ public class EnemySpaceShip extends Mob {
         }
     }
 
-    public ArrayList<EnemyBullets> getEnemyBullets() {
-        return enemyBullets;
-    }
 
-    public void setEnemyBullets(ArrayList<EnemyBullets> enemyBullets) {
-        this.enemyBullets = enemyBullets;
-    }
+
 }
 
