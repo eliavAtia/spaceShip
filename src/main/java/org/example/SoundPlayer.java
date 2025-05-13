@@ -6,7 +6,7 @@ import java.net.URL;
 
 public class SoundPlayer {
     private Clip clip ;
-    private Clip backGroundMusic;
+    private int pausedFramePosition = 0;
 
 
     public SoundPlayer(String soundPath) {
@@ -27,22 +27,37 @@ public class SoundPlayer {
             if (clip.isRunning()) {
                 clip.stop();
             }
+            pausedFramePosition = 0;
             clip.setFramePosition(0);
             clip.start();
         }
     }
     public void playLoop() {
         if (clip != null) {
-            clip.loop(Clip.LOOP_CONTINUOUSLY); // שמירה על הלולאה
-            clip.setFramePosition(0); // לוודא שהסאונד מתחיל מההתחלה
+            pausedFramePosition = 0;
+            clip.setFramePosition(0);
             clip.start();
         }
     }
+
+    public void pause() {
+        if (clip != null && clip.isRunning()) {
+            pausedFramePosition = clip.getFramePosition();
+            clip.stop();
+        }
+    }
+
+    public void resume() {
+        if (clip != null && !clip.isRunning()) {
+            clip.setFramePosition(pausedFramePosition);
+            clip.start();
+        }
+    }
+
     public void stop() {
         if (clip != null && clip.isRunning()) {
             clip.stop();
             clip.close();
         }
-
     }
 }
