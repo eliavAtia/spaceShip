@@ -82,16 +82,14 @@ public class Boss extends  Mob {
     }
 
 
-    public void moveSideways(int windowWidth) {
-        if (movingRight) {
-            setX(getX()+1);
-            if (getX() >= windowWidth-100) {
-                movingRight = false;
+    public void moveSideways(int windowWidth,Player player) {
+        if (player.getX()>getX()) {
+            if(getX()<windowWidth-getWidth()/2+player.getWidth()/2){
+                setX(getX()+1);
             }
-        } else {
-            setX(getX()-1);;
-            if (getX() <= 0) {
-                movingRight = true;
+        } else if (player.getX()<getX()){
+            if (getX()>getWidth()){
+                setX(getX()-1);;
             }
         }
     }

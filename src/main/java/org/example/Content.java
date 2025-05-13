@@ -37,7 +37,7 @@ public class Content extends JPanel implements KeyListener {
     private String playerName;
     private Leaderboard leaderboard;
     private boolean isSaved;
-//    private boolean boss1Defeated,boss3Defeated,boss2Defeated, bossActivated;
+    private boolean boss1Defeated,boss3Defeated,boss2Defeated, bossActivated;
 
 
 
@@ -211,7 +211,12 @@ public class Content extends JPanel implements KeyListener {
         }
         for (Boss boss : bosses) {
             boss.draw(g);
-            boss.move();
+            boss.moveDownWhenComing();
+            boss.moveSideways(getWidth(),player);
+            if (boss.getY() > 100) {
+                boss.shoot();
+                boss.updateBullets();
+            }
         }
         for (EnemySpaceShip enemySpaceShip : enemySpaceShips) {
             enemySpaceShip.paint(g);
@@ -592,52 +597,35 @@ public class Content extends JPanel implements KeyListener {
         allDirections();
         infiniteScoreAdd();
         action();
+        bossActivation();
     }
 
 
-//    private void checkBulletBossCollision() {
-//        if (bosses.isEmpty()) return;
-//        Rectangle bossRect = bosses.get(0).getBounds();
-//        List<Bullet> bulletsToRemove = new ArrayList<>();
-//        for (Bullet b : bullets) {
-//            Rectangle bulletRect = new Rectangle(b.getX(), b.getY(), b.getWidth(), b.getHeight());
-//            if (bossRect.intersects(bulletRect) && !boss1Defeated) {
-//                bosses.get(0).mobHit();
-//                bulletsToRemove.add(b);
-//                if (bosses.get(0).getLife() <= 0) {;
-//                    explosions.add(new Explosion(bosses.get(0).getX(), bosses.get(0).getY()));
-//                    bosses.remove(bosses.get(0));
-//                    this.boss1Defeated = true;
-//                    bossActivated = false;
-//                }
-//            }
 
-//        }
 
-//        bullets.removeAll(bulletsToRemove);
-//    }
-//    private void BossActivation(){
-//        new Thread(()-> {
-//            while (!isGameOver) {
-//                checkBulletBossCollision();
-//                if (score > 5000 && bosses.isEmpty() && !boss1Defeated) {
-//                    bosses.add(new Boss(1));
-//                    bossActivated = true;
-//                    meteors.removeAll(meteors);
-//                    enemySpaceShips.removeAll(enemySpaceShips);
-//                }
-//                try {
-//                    Thread.sleep(60);
-//                }catch (InterruptedException e){
-//                    e.printStackTrace();
-//                }
-//            }
-
-//        }).start();
-
-//    }
 
     public Leaderboard getLeaderboard(){
         return this.leaderboard;
     }
+
+    private void bossActivation(){
+    new Thread(()-> {
+        while (!isGameOver) {
+            this.bosses.removeAll(checkBulletsCollision(new ArrayList<Mob>(bosses),1000,2));
+            if (score > 400 && bosses.isEmpty() && !boss1Defeated) {
+                bosses.add(new Boss(1));
+                bossActivated = true;
+                meteors.removeAll(meteors);
+                enemySpaceShips.removeAll(enemySpaceShips);
+            }
+            try {
+                Thread.sleep(60);
+            }catch (InterruptedException e){
+                e.printStackTrace();
+            }
+        }
+
+    }).start();
+
+}
 }
