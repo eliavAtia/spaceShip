@@ -40,6 +40,7 @@ public class LeaderBoardsFrame extends JPanel {
                 text =  score.toString();
             }
 
+
             JLabel scoreLabel = new JLabel(text);
             scoreLabel.setForeground(Color.WHITE);
             scoreLabel.setFont(new Font("Arial", Font.BOLD, 24));
