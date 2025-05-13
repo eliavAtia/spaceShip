@@ -54,20 +54,13 @@ public class EnemySpaceShip extends Mob {
 
     public void paint(Graphics graphics){
         if(isShouldDrawMobImage()){
-            if (getImage() != null) {
-                graphics.drawImage(getImage(), getX() - getWidth()/2, getY() - getHeight()/2, getWidth(), getHeight(), null);
-                graphics.fillRect(getX() - getWidth()/2 , getY() - getHeight()/2+50, getWidth(), 10);
-                graphics.setColor(Color.RED);
-                graphics.fillRect(getX() - getWidth()/2 , getY() - getHeight()/2+50, (int) ((double) getLife() / maxHp * getWidth()), 10);
-            } else {
-                graphics.setColor(Color.RED);
-                graphics.fillRect(getX() - getWidth()/2, getY() - getHeight()/2, getWidth(), getHeight());
-                graphics.setColor(Color.BLACK);
-                graphics.drawString("תמונה חסרה", getX() + 10, getY() + getHeight() / 2);
-            }
-            for (EnemyBullets enemyBullet : enemyBullets){
-                enemyBullet.paint(graphics);
-            }
+            graphics.drawImage(getImage(), getX() - getWidth()/2, getY() - getHeight()/2, getWidth(), getHeight(), null);
+        }
+        graphics.fillRect(getX() - getWidth()/2 , getY() - getHeight()/2+50, getWidth(), 10);
+        graphics.setColor(Color.RED);
+        graphics.fillRect(getX() - getWidth()/2 , getY() - getHeight()/2+50, (int) ((double) getLife() / maxHp * getWidth()), 10);
+        for (EnemyBullets enemyBullet : enemyBullets){
+            enemyBullet.paint(graphics);
         }
     }
 

@@ -211,8 +211,7 @@ public class Content extends JPanel implements KeyListener {
         }
         for (Boss boss : bosses) {
             boss.draw(g);
-            boss.moveDownWhenComing();
-            boss.moveSideways(getWidth(),player);
+            boss.moveSideways(player);
             if (boss.getY() > 100) {
                 boss.shoot();
                 boss.updateBullets();
@@ -600,32 +599,31 @@ public class Content extends JPanel implements KeyListener {
         bossActivation();
     }
 
+    private void bossActivation(){
+        new Thread(()-> {
+            while (!isGameOver) {
+                if (score > 400 && !boss1Defeated) {
+                    if(bosses.isEmpty()){
+                        bosses.add(new Boss(1,getWidth()));
+                    }
+                    meteors.removeAll(meteors);
+                    enemySpaceShips.removeAll(enemySpaceShips);
+                    this.bosses.removeAll(checkBulletsCollision(new ArrayList<Mob>(bosses),1000,2));
+                    this.bosses.getFirst().getBullets().removeAll(checkPlayerCollision(new ArrayList<Mob>(this.bosses.getFirst().getBullets())));
+                    if(bosses.getFirst().getLife()<=0){
+                        boss1Defeated=true;
+                    }
+                }
+                try {
+                    Thread.sleep(60);
+                }catch (InterruptedException e){
+                    e.printStackTrace();
+                }
+            }
 
+        }).start();
 
-
-
-    public Leaderboard getLeaderboard(){
-        return this.leaderboard;
     }
 
-    private void bossActivation(){
-    new Thread(()-> {
-        while (!isGameOver) {
-            this.bosses.removeAll(checkBulletsCollision(new ArrayList<Mob>(bosses),1000,2));
-            if (score > 400 && bosses.isEmpty() && !boss1Defeated) {
-                bosses.add(new Boss(1));
-                bossActivated = true;
-                meteors.removeAll(meteors);
-                enemySpaceShips.removeAll(enemySpaceShips);
-            }
-            try {
-                Thread.sleep(60);
-            }catch (InterruptedException e){
-                e.printStackTrace();
-            }
-        }
 
-    }).start();
-
-}
 }
