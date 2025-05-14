@@ -9,7 +9,7 @@ public class EnemySpaceShip extends Mob {
     ArrayList<EnemyBullets> enemyBullets = new ArrayList<>();
     private long lastShotTime = 0;
     private static final long SHOOT_SPAWN_DELAY = 1500;
-    private boolean movingRight = true;
+    private boolean movingRight;
     private int maxHp;
     public ArrayList<EnemyBullets> getEnemyBullets() {
         return enemyBullets;
@@ -18,7 +18,7 @@ public class EnemySpaceShip extends Mob {
         this.enemyBullets = enemyBullets;
     }
     private ImageIcon bulletImage;
-
+    int windowWidth;
 
 
     public EnemySpaceShip(int x, int y){
@@ -28,6 +28,7 @@ public class EnemySpaceShip extends Mob {
         setWidth(200);
         this.maxHp = 30;
         setLife(maxHp);
+        this.movingRight = x >= windowWidth / 2;
         try {
             ImageIcon imageIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/Enemy.png")));
             setImage(imageIcon.getImage());
@@ -72,6 +73,7 @@ public class EnemySpaceShip extends Mob {
     }
 
     public void moveSideways(int windowWidth) {
+        this.windowWidth=windowWidth;
         if (movingRight) {
             setX(getX()+1);
             if (getX() >= windowWidth-100) {

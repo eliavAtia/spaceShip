@@ -38,11 +38,11 @@ public class Content extends JPanel implements KeyListener {
     private Leaderboard leaderboard;
     private boolean isSaved;
     private boolean boss1Defeated;
-
-
-
+    private int difficultyLevel=1;
+    private Random random;
     //builders
     public Content(String playerName,JFrame frame, int x, int y, int width, int height, StartScreen parentPanel) {
+        random=new Random();
         this.setBounds(x, y, width, height);
         this.playerName=playerName;
         imageSoundBuilder();
@@ -473,7 +473,7 @@ public class Content extends JPanel implements KeyListener {
                 if (mobRectangle.intersects(bulletRectangle)) {
                     mob.mobHit(player.getBulletDamage());
                     if(mob.getLife() <= 0){
-                        score += pointsPerHit;
+                        score += (pointsPerHit*player.getXP());
                         mobsToRemove.add(mob);
                         explosions.add(new Explosion(mob.getX(), mob.getY()));
                         if (num==1){
@@ -563,6 +563,7 @@ public class Content extends JPanel implements KeyListener {
                     updateMeteors();
                     updateEnemySpaceShips();
                     updateBoosts();
+                    updateLevel();
                     this.meteors.removeAll(checkBulletsCollision(new ArrayList<Mob>(meteors),100,6));
                     this.meteors.removeAll(checkPlayerCollision(new ArrayList<Mob>(meteors)));
                     this.enemySpaceShips.removeAll(checkBulletsCollision(new ArrayList<Mob>(enemySpaceShips),200,2));
@@ -574,8 +575,10 @@ public class Content extends JPanel implements KeyListener {
                         enemySpaceShip.setEnemyBullets(newBullets);
                     }
                     if (score > enemyRespawn[0]) {
-                        enemySpaceShips.add(new EnemySpaceShip(getWidth()/2,-15));
-                        enemyRespawn[0] +=2000;
+                        for (int i = 0; i < difficultyLevel; i++) {
+                            enemySpaceShips.add(new EnemySpaceShip(random.nextInt(getWidth()),-15));
+                        }
+                        enemyRespawn[0] +=(2000*difficultyLevel/2);
                     }
                     repaint();
                 }
@@ -596,22 +599,29 @@ public class Content extends JPanel implements KeyListener {
     }
 
     private void bossActivation(){
+        final int[] bossRespawn = {200};
         new Thread(()-> {
             while (!isGameOver) {
-                if (score > 200 && !boss1Defeated) {
+                if (score > bossRespawn[0] ) {
                     if(bosses.isEmpty()){
                         backGroundSound.pause();
                         bossTheme.playLoop();
                         bosses.add(new Boss(1,getWidth(),getHeight()));
                     }
-                    bosses.getFirst().moveSideways(player);
-                    bosses.getFirst().updateBullets();
-                    meteors.removeAll(meteors);
-                    enemySpaceShips.removeAll(enemySpaceShips);
-                    this.bosses.removeAll(checkBulletsCollision(new ArrayList<Mob>(bosses),1000,2));
-                    this.bosses.getFirst().getBullets().removeAll(checkPlayerCollision(new ArrayList<Mob>(this.bosses.getFirst().getBullets())));
-                    if(bosses.getFirst().getLife()<=0){
-                        boss1Defeated=true;
+                    if (!bosses.isEmpty()){
+                        bosses.getFirst().moveSideways(player);
+                        bosses.getFirst().updateBullets();
+                        meteors.removeAll(meteors);
+                        enemySpaceShips.removeAll(enemySpaceShips);
+                        this.bosses.removeAll(checkBulletsCollision(new ArrayList<Mob>(bosses),1000,2));
+                        this.bosses.getFirst().getBullets().removeAll(checkPlayerCollision(new ArrayList<Mob>(this.bosses.getFirst().getBullets())));
+                    }
+                    if(!bosses.isEmpty()&&bosses.getFirst().getLife()<=0){
+                        bossRespawn[0] +=2500;
+                        boosts.add(new Boost(random.nextInt(bosses.getFirst().getX()-getWidth()/2,bosses.getFirst().getX()+getWidth()),bosses.getFirst().getY(),1,player));
+                        boosts.add(new Boost(random.nextInt(bosses.getFirst().getX()-getWidth()/2,bosses.getFirst().getX()+getWidth()),bosses.getFirst().getY(),2,player));
+                        boosts.add(new Boost(random.nextInt(bosses.getFirst().getX()-getWidth()/2,bosses.getFirst().getX()+getWidth()),bosses.getFirst().getY(),3,player));
+                        bosses.clear();
                         bossTheme.stop();
                         backGroundSound.resume();
                     }
@@ -624,8 +634,10 @@ public class Content extends JPanel implements KeyListener {
             }
 
         }).start();
-
     }
-
-
+    private void updateLevel() {
+        if (difficultyLevel <= 5 && score>5000) {
+            difficultyLevel = score / 5000;
+        }
+    }
 }

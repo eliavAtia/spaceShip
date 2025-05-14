@@ -37,7 +37,7 @@ public class Boost{
                     player.setBulletDamage(player.getBulletDamage()*2);
                     whatsOn[1]=true;break;
             case 3: player.setShieldOn(true);whatsOn[2]=true;break;
-            case 4: player.setXP(player.getXP()*4);whatsOn[3]=true;break;
+            case 4: player.setXP(player.getXP()*2);whatsOn[3]=true;break;
         }
         player.setBoostsThatAreOn(whatsOn);
         new Thread(()->{
@@ -52,7 +52,7 @@ public class Boost{
                     player.setBulletDamage(player.getBulletDamage()/2);
                     whatsOn[1]=false;break;
                 case 3: player.setShieldOn(false);whatsOn[2]=false;break;
-                case 4: player.setXP(player.getXP()/4);whatsOn[3]=false;break;
+                case 4: player.setXP(player.getXP()/2);whatsOn[3]=false;break;
             }
         }).start();
         player.setBoostsThatAreOn(whatsOn);
