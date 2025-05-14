@@ -24,6 +24,8 @@ public class Player  {
     private int bulletDamage;
     private int XP;
     private boolean[] boostsThatAreOn;
+
+
     public Player(int x,int y,int width,int height){
         this.x=x;
         this.y=y;
@@ -71,6 +73,7 @@ public class Player  {
             shouldDrawPlayerImage = true;
         }).start();
     }
+
     public void playerMove(int vertical,int horizontal){
         x+=horizontal;
         y+=vertical;
@@ -144,6 +147,7 @@ public class Player  {
             shouldDrawPlayerImage = true;
         }
     }
+
     public void updateBullets(){
         long now = System.currentTimeMillis();
         ArrayList<Bullet> bulletsToRemove = new ArrayList<>();
@@ -163,14 +167,6 @@ public class Player  {
         }
     }
 
-    public long getBULLET_SPAWN_DELAY() {
-        return BULLET_SPAWN_DELAY;
-    }
-
-    public void setBULLET_SPAWN_DELAY(long BULLET_SPAWN_DELAY) {
-        this.BULLET_SPAWN_DELAY = BULLET_SPAWN_DELAY;
-    }
-
     public List<Bullet> getBullets() {
         return bullets;
     }
@@ -179,80 +175,8 @@ public class Player  {
         this.bullets = bullets;
     }
 
-    public boolean isDownPressed() {
-        return downPressed;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
-    }
-
-    public Image getImage1() {
-        return image1;
-    }
-
-    public void setImage1(Image image1) {
-        this.image1 = image1;
-    }
-
-    public Image getImage2() {
-        return image2;
-    }
-
-    public void setImage2(Image image2) {
-        this.image2 = image2;
-    }
-
-    public Image getImage3() {
-        return image3;
-    }
-
-    public void setImage3(Image image3) {
-        this.image3 = image3;
-    }
-
-    public SoundPlayer getLasers() {
-        return lasers;
-    }
-
-    public void setLasers(SoundPlayer lasers) {
-        this.lasers = lasers;
-    }
-
-    public long getLastBulletSpawnTime() {
-        return lastBulletSpawnTime;
-    }
-
-    public void setLastBulletSpawnTime(long lastBulletSpawnTime) {
-        this.lastBulletSpawnTime = lastBulletSpawnTime;
-    }
-
-    public boolean isLeftPressed() {
-        return leftPressed;
-    }
-
-    public boolean isRightPressed() {
-        return rightPressed;
-    }
-
-    public boolean isShouldDrawPlayerImage() {
-        return shouldDrawPlayerImage;
-    }
-
-    public void setShouldDrawPlayerImage(boolean shouldDrawPlayerImage) {
-        this.shouldDrawPlayerImage = shouldDrawPlayerImage;
-    }
-
-    public boolean isSpacePressed() {
-        return spacePressed;
-    }
-
     public void setSpacePressed(boolean spacePressed) {
         this.spacePressed = spacePressed;
-    }
-
-    public boolean isUpPressed() {
-        return upPressed;
     }
 
     public void setWidth(int width) {
@@ -306,4 +230,5 @@ public class Player  {
     public void setBoostsThatAreOn(boolean[] boostsThatAreOn) {
         this.boostsThatAreOn = boostsThatAreOn;
     }
+
 }

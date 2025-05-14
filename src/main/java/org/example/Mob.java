@@ -31,7 +31,6 @@ public class Mob {
         return shouldDrawMobImage;
     }
 
-
     public int getX() {
         return x;
     }

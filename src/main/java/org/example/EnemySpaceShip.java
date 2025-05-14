@@ -59,9 +59,11 @@ public class EnemySpaceShip extends Mob {
         if(isShouldDrawMobImage()){
             graphics.drawImage(getImage(), getX() - getWidth()/2, getY() - getHeight()/2, getWidth(), getHeight(), null);
         }
+        graphics.setColor(Color.GRAY);
         graphics.fillRect(getX() - getWidth()/2 , getY() - getHeight()/2+50, getWidth(), 10);
         graphics.setColor(Color.RED);
         graphics.fillRect(getX() - getWidth()/2 , getY() - getHeight()/2+50, (int) ((double) getLife() / maxHp * getWidth()), 10);
+        graphics.setColor(Color.BLACK);
         for (EnemyBullets enemyBullet : enemyBullets){
             enemyBullet.paint(graphics);
 

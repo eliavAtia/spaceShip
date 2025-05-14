@@ -43,8 +43,4 @@ public class Bullet {
     public int getWidth() {
         return width;
     }
-
-    public boolean isOutOfbounds(){
-        return this.y<0;
-    }
 }

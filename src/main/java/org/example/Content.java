@@ -40,6 +40,9 @@ public class Content extends JPanel implements KeyListener {
     private boolean boss1Defeated;
     private int difficultyLevel=1;
     private Random random;
+
+
+
     //builders
     public Content(String playerName,JFrame frame, int x, int y, int width, int height, StartScreen parentPanel) {
         random=new Random();
@@ -129,18 +132,9 @@ public class Content extends JPanel implements KeyListener {
         this.pauseButton.addActionListener((e) -> pauseButtonAction());
     }
 
-    private void goBackToMenuAction(){
-        frame.setContentPane(menu);
-        menu.returnToPreviousPanel(); // מכין מחדש את הכפתורים והמצב
-        backGroundSound.stop();
-        frame.revalidate();
-        frame.repaint();
-        menu.requestFocusInWindow();
-    }
 
 
     //buttons actions
-
     private void pauseButtonAction(){
         this.isPaused = !isPaused;
         if (!isPaused) {
@@ -155,6 +149,15 @@ public class Content extends JPanel implements KeyListener {
                 action();
             }
         }
+    }
+
+    private void goBackToMenuAction(){
+        frame.setContentPane(menu);
+        menu.returnToPreviousPanel(); // מכין מחדש את הכפתורים והמצב
+        backGroundSound.stop();
+        frame.revalidate();
+        frame.repaint();
+        menu.requestFocusInWindow();
     }
 
 
@@ -577,8 +580,14 @@ public class Content extends JPanel implements KeyListener {
                         enemySpaceShip.setEnemyBullets(newBullets);
                     }
                     if (score > enemyRespawn[0]) {
+                        int num = random.nextInt(getWidth());
                         for (int i = 0; i < difficultyLevel; i++) {
-                            enemySpaceShips.add(new EnemySpaceShip(random.nextInt(getWidth()),-15));
+                            enemySpaceShips.add(new EnemySpaceShip(num,-15));
+                            int num2 = random.nextInt(getWidth());
+                            while (Math.abs(num-num2)<player.getWidth()+15){
+                                num2 = random.nextInt(getWidth());
+                            }
+                            num = num2;
                         }
                         enemyRespawn[0] +=(2000*difficultyLevel/2);
                     }
@@ -602,10 +611,8 @@ public class Content extends JPanel implements KeyListener {
 
     private void bossActivation() {
         final int[] bossRespawn = {10000};
-
         new Thread(() -> {
             while (!isGameOver) {
-                // אם הניקוד חצה את הרף הנוכחי
                 while (score > bossRespawn[0]) {
                     bossRespawn[0] += 10000;
                     if (bosses.isEmpty()) {
@@ -644,6 +651,7 @@ public class Content extends JPanel implements KeyListener {
             }
         }).start();
     }
+
     private void updateLevel() {
         if (difficultyLevel <= 5 && score>5000) {
             difficultyLevel = score / 5000;

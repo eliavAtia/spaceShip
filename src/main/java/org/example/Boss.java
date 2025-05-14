@@ -17,6 +17,8 @@ public class Boss extends  Mob {
     private int windowHeight;
     private ImageIcon bulletImage;
     private SoundPlayer bossShot;
+
+
     public Boss(int type,int windowWidth,int windowHeight) {
         this.bullets = new CopyOnWriteArrayList<EnemyBullets>();
         this.type = type;
@@ -25,6 +27,7 @@ public class Boss extends  Mob {
         setByType();
 
     }
+
 
     private void setByType(){
         switch (this.type){
@@ -65,9 +68,6 @@ public class Boss extends  Mob {
     }
 
 
-
-
-
     public void draw(Graphics g) {
         if(isShouldDrawMobImage()){
             g.drawImage(getImage(), getX() - getWidth()/2, getY() - getHeight()/2, getWidth(), getHeight(), null);
@@ -79,8 +79,6 @@ public class Boss extends  Mob {
             enemyBullets.paint(g);
         }
     }
-
-
 
 
     public void moveSideways(Player player) {

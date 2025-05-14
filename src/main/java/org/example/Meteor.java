@@ -25,7 +25,6 @@ public class Meteor extends Mob{
         }
     }
 
-
     public void paint(Graphics g) {
         if(isShouldDrawMobImage()) {
             if (image != null) {

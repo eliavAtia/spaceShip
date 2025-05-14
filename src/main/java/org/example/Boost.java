@@ -14,6 +14,8 @@ public class Boost{
     private int type;
     private Image image;
     private Player player;
+
+
     public Boost(int x,int y,int type,Player player){
         this.player=player;
         this.type=type;
@@ -23,6 +25,8 @@ public class Boost{
         this.x=x;
         this.y=y;
     }
+
+
     public void effect(){
         boolean[] whatsOn= player.getBoostsThatAreOn();
         if (whatsOn[type-1]){
@@ -57,6 +61,8 @@ public class Boost{
         }).start();
         player.setBoostsThatAreOn(whatsOn);
     }
+
+
     private void meathelImages(){
         switch (type){
             case 1: this.image=new ImageIcon(getClass().getResource("/Images/minecraftFullHeart.png")).getImage();break;
@@ -65,19 +71,20 @@ public class Boost{
             case 4: this.image=new ImageIcon(getClass().getResource("/Images/xpIcon.png")).getImage();break;
         }
     }
+
+
     public void draw(Graphics g){
         g.drawImage(image,x,y,width,height,null);
     }
+
+
     public void move(){
         this.y++;
     }
 
+
     public int getHeight() {
         return height;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
     }
 
     public Image getImage() {
@@ -86,22 +93,6 @@ public class Boost{
 
     public void setImage(Image image) {
         this.image = image;
-    }
-
-    public Player getPlayer() {
-        return player;
-    }
-
-    public void setPlayer(Player player) {
-        this.player = player;
-    }
-
-    public int getType() {
-        return type;
-    }
-
-    public void setType(int type) {
-        this.type = type;
     }
 
     public int getWidth() {

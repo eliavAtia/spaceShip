@@ -9,15 +9,17 @@ public class LeaderBoardsFrame extends JPanel {
     private final Image image;
     private static Font customFont;
     private StartScreen parentPanel;
+
+
     public LeaderBoardsFrame(Leaderboard leaderboard, int x, int y,StartScreen parentPanel) {
         image = new ImageIcon(getClass().getResource("/Images/leaderboard.png")).getImage();
         int width = image.getWidth(this);
         int height = image.getHeight(this);
         this.parentPanel=parentPanel;
         ImageIcon exitIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/exit.png")));
-        setBounds(x - width / 2, y - height / 2, width*2, height); // למרכז
+        setBounds(x - width / 2, y - height / 2, width*2, height);
 
-        setLayout(null); // מיקום ידני!
+        setLayout(null);
         setOpaque(false);
         try {
             customFont = Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(getClass().getResourceAsStream("/fonts/PressStart2P-Regular.ttf"))).deriveFont(24f);
@@ -30,8 +32,8 @@ public class LeaderBoardsFrame extends JPanel {
         leaderboard.loadFromFile();
         java.util.List<PlayerScore> scores = leaderboard.getSortedScores();
 
-        int baseY = 198;      // נקודת התחלה של השורה הראשונה (לשנות לפי התמונה)
-        int rowHeight = 67;   // מרווח בין שורות (מדוד לפי העיצוב שלך)
+        int baseY = 198;
+        int rowHeight = 67;
 
         for (int i = 0; i < 5; i++) {
             String text=" ";
@@ -64,4 +66,5 @@ public class LeaderBoardsFrame extends JPanel {
         super.paintComponent(g);
         g.drawImage(image, 0, 0, image.getWidth(this), image.getHeight(this), this);
     }
+
 }

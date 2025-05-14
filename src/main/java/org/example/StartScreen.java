@@ -58,6 +58,7 @@ public class StartScreen extends JPanel {
         contentPanel.setLayout(null);
         contentPanel.setOpaque(false);
     }
+
     private void leaderboardsBuilder(int Width,int High){
         this.leaderBoardsFrame=new LeaderBoardsFrame(leaderboard,getWidth()/2,getHeight()/2,this);
         this.leaderBoardsFrame.setVisible(true);
@@ -159,7 +160,6 @@ public class StartScreen extends JPanel {
         this.revalidate();
         this.repaint();
     }
-
 
     @Override
     protected void paintComponent(Graphics g) {

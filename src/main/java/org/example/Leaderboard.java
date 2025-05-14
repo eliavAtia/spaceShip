@@ -19,15 +19,6 @@ public class Leaderboard {
         saveToFile();
     }
 
-
-
-    public void printLeaderboard() {
-        Collections.sort(scores);
-        for (int i = 0; i < scores.size(); i++) {
-            System.out.println((i + 1) + ". " + scores.get(i));
-        }
-    }
-
     public void loadFromFile() {
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(FILE_NAME))) {
             scores = (List<PlayerScore>) in.readObject();
@@ -43,6 +34,7 @@ public class Leaderboard {
             System.out.println("שגיאה בשמירה: " + e.getMessage());
         }
     }
+
     public List<PlayerScore> getSortedScores() {
         Collections.sort(scores);
         return new ArrayList<>(scores); // מחזיר עותק ממויין

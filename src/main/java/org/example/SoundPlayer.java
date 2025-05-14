@@ -20,8 +20,6 @@ public class SoundPlayer {
         }
     }
 
-
-
     public void playSound() {
         if (clip != null) {
             if (clip.isRunning()) {
@@ -32,6 +30,7 @@ public class SoundPlayer {
             clip.start();
         }
     }
+
     public void playLoop() {
         if (clip != null) {
             pausedFramePosition = 0;
@@ -41,6 +40,7 @@ public class SoundPlayer {
         }
 
     }
+
     public boolean isRunning() {
         return clip != null && clip.isRunning();
     }
@@ -64,4 +64,5 @@ public class SoundPlayer {
             clip.stop();
         }
     }
+
 }

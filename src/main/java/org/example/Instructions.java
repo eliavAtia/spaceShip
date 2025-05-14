@@ -14,10 +14,8 @@ public class Instructions extends JPanel {
         setOpaque(false);
         this.parentPanel = parentPanel;
         backgroundImage = new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/מגילה GIF 2.gif")));
-
         ImageIcon exitIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/exit.png")));
         exitIcon.setImage(exitIcon.getImage().getScaledInstance(50,30,Image.SCALE_SMOOTH));
-
         JButton close = new JButton(exitIcon);
         close.setBounds(getWidth()-(getWidth()/10)-30, getHeight()-(getHeight()/10)*9+10, 30, 20); // מיקום כפתור "סגור"
         close.addActionListener((e) -> {
@@ -25,11 +23,8 @@ public class Instructions extends JPanel {
             parentPanel.revalidate();
             parentPanel.repaint();
         });
-
         add(close);
-
     }
-
 
     public void changePhotoBackground(){
         backgroundImage = new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/scroll last frame.gif")));
@@ -79,7 +74,6 @@ public class Instructions extends JPanel {
             }
         }).start();
     }
-
 
     @Override
     protected void paintComponent(Graphics g) {
