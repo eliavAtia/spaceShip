@@ -598,29 +598,37 @@ public class Content extends JPanel implements KeyListener {
         bossActivation();
     }
 
-    private void bossActivation(){
-        final int[] bossRespawn = {200};
-        new Thread(()-> {
+    private void bossActivation() {
+        final int[] bossRespawn = {10000};
+
+        new Thread(() -> {
             while (!isGameOver) {
-                if (score > bossRespawn[0] ) {
-                    if(bosses.isEmpty()){
+                // אם הניקוד חצה את הרף הנוכחי
+                while (score > bossRespawn[0]) {
+                    bossRespawn[0] += 10000;
+                    if (bosses.isEmpty()) {
                         backGroundSound.pause();
                         bossTheme.playLoop();
-                        bosses.add(new Boss(1,getWidth(),getHeight()));
+                        bosses.add(new Boss(1, getWidth(), getHeight()));
+                        break;
                     }
-                    if (!bosses.isEmpty()){
-                        bosses.getFirst().moveSideways(player);
-                        bosses.getFirst().updateBullets();
-                        meteors.removeAll(meteors);
-                        enemySpaceShips.removeAll(enemySpaceShips);
-                        this.bosses.removeAll(checkBulletsCollision(new ArrayList<Mob>(bosses),1000,2));
-                        this.bosses.getFirst().getBullets().removeAll(checkPlayerCollision(new ArrayList<Mob>(this.bosses.getFirst().getBullets())));
-                    }
-                    if(!bosses.isEmpty()&&bosses.getFirst().getLife()<=0){
-                        bossRespawn[0] +=2500;
-                        boosts.add(new Boost(random.nextInt(bosses.getFirst().getX()-getWidth()/2,bosses.getFirst().getX()+getWidth()),bosses.getFirst().getY(),1,player));
-                        boosts.add(new Boost(random.nextInt(bosses.getFirst().getX()-getWidth()/2,bosses.getFirst().getX()+getWidth()),bosses.getFirst().getY(),2,player));
-                        boosts.add(new Boost(random.nextInt(bosses.getFirst().getX()-getWidth()/2,bosses.getFirst().getX()+getWidth()),bosses.getFirst().getY(),3,player));
+                }
+                if (!bosses.isEmpty()) {
+                    Boss boss = bosses.getFirst();
+                    boss.moveSideways(player);
+                    boss.updateBullets();
+                    meteors.clear();
+                    enemySpaceShips.clear();
+                    bosses.removeAll(checkBulletsCollision(new ArrayList<>(bosses), 1000, 2));
+                    boss.getBullets().removeAll(checkPlayerCollision(new ArrayList<>(boss.getBullets())));
+                    if (boss.getLife() <= 0) {
+                        int bossX = boss.getX();
+                        int bossY = boss.getY();
+                        int minX = bossX - boss.getWidth() / 2;
+                        int maxX = bossX + boss.getWidth();
+                        boosts.add(new Boost(random.nextInt(minX, maxX), bossY, 1, player));
+                        boosts.add(new Boost(random.nextInt(minX, maxX), bossY, 2, player));
+                        boosts.add(new Boost(random.nextInt(minX, maxX), bossY, 3, player));
                         bosses.clear();
                         bossTheme.stop();
                         backGroundSound.resume();
@@ -628,11 +636,10 @@ public class Content extends JPanel implements KeyListener {
                 }
                 try {
                     Thread.sleep(60);
-                }catch (InterruptedException e){
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-
         }).start();
     }
     private void updateLevel() {

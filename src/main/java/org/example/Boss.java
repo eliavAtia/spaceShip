@@ -17,13 +17,13 @@ public class Boss extends  Mob {
     private int windowHeight;
     private ImageIcon bulletImage;
     private SoundPlayer bossShot;
-
     public Boss(int type,int windowWidth,int windowHeight) {
         this.bullets = new CopyOnWriteArrayList<EnemyBullets>();
         this.type = type;
         this.windowWidth = windowWidth;
         this.windowHeight = windowHeight;
         setByType();
+
     }
 
     private void setByType(){
@@ -39,6 +39,7 @@ public class Boss extends  Mob {
                 setY(getHeight()/2);
                 this.maxHp=180;
                 setLife(maxHp);
+
         }
 
     }
