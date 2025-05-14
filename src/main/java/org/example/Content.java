@@ -40,7 +40,7 @@ public class Content extends JPanel implements KeyListener {
     private boolean bossActive;
     private int difficultyLevel=1;
     private Random random;
-
+    private int bossHeight;
 
 
 
@@ -51,9 +51,7 @@ public class Content extends JPanel implements KeyListener {
         this.playerName=playerName;
         imageSoundBuilder();
         this.frame = frame;
-
         this.menu = parentPanel;
-
         setFocusable(true);
         requestFocusInWindow();
         addKeyListener(this);
@@ -373,7 +371,7 @@ public class Content extends JPanel implements KeyListener {
     private void updateEnemySpaceShips(){
         int getToY=70;
         if (bossActive){
-            getToY=140;
+            getToY=bossHeight+30;
         }
         ArrayList<EnemySpaceShip> toRemove = new ArrayList<>();
         for (EnemySpaceShip enemySpaceShip : enemySpaceShips) {
@@ -616,15 +614,16 @@ public class Content extends JPanel implements KeyListener {
     }
 
     private void bossActivation() {
-        final int[] bossRespawn = {80000,new Boss(difficultyLevel,1, getWidth(), getHeight()).getLife()-50};
+        final int[] bossRespawn = {8000,new Boss(difficultyLevel,1, getWidth(), getHeight()).getLife()-50};
         new Thread(() -> {
             while (!isGameOver) {
                 while (score > bossRespawn[0]) {
-                    bossRespawn[0] += 80000;
+                    bossRespawn[0] += 8000;
                     if (bosses.isEmpty()) {
                         backGroundSound.pause();
                         bossTheme.playLoop();
                         bosses.add(new Boss(difficultyLevel,1, getWidth(), getHeight()));
+                        bossHeight=bosses.getFirst().getHeight();
                         bossActive=true;
                         meteors.clear();
                         enemySpaceShips.clear();
