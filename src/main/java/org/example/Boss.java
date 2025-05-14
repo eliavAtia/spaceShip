@@ -12,20 +12,22 @@ public class Boss extends  Mob {
     private int maxHp;
     private List<EnemyBullets> bullets;
     private long lastTime = 0;
-    private static final long SHOOT_SPAWN_DELAY = 1500;
+    private long SHOOT_SPAWN_DELAY;
     private int windowWidth;
     private int windowHeight;
     private ImageIcon bulletImage;
     private SoundPlayer bossShot;
+    private int speed;
 
-
-    public Boss(int type,int windowWidth,int windowHeight) {
+    public Boss(int level,int type,int windowWidth,int windowHeight) {
         this.bullets = new CopyOnWriteArrayList<EnemyBullets>();
         this.type = type;
         this.windowWidth = windowWidth;
         this.windowHeight = windowHeight;
+        this.maxHp=180+20*level;
+        this.SHOOT_SPAWN_DELAY=1500-(level-1)*75;
+        this.speed=10+(level-1);
         setByType();
-
     }
 
 
@@ -40,9 +42,7 @@ public class Boss extends  Mob {
                 setHeight(icon.getIconHeight()*2);
                 setX(windowWidth/2);
                 setY(getHeight()/2);
-                this.maxHp=180;
                 setLife(maxHp);
-
         }
 
     }
@@ -88,11 +88,11 @@ public class Boss extends  Mob {
         else {
             if ((player.getX()+player.getWidth()/2)>getX()+1) {
                 if(getX()<windowWidth-getWidth()/2+player.getWidth()/2){
-                    setX(getX()+10);
+                    setX(getX()+speed);
                 }
             } else if ((player.getX()+player.getWidth()/2)<getX()-1){
                 if (getX()>getWidth()/2-player.getWidth()/2){
-                    setX(getX()-10);;
+                    setX(getX()-speed);;
                 }
             }
         }

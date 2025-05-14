@@ -166,6 +166,7 @@ public class StartScreen extends JPanel {
         super.paintComponent(g);
         g.drawImage(Gif.getImage(), 0, 0, getWidth(), getHeight(), this);
         g.drawImage(nameImages.getImage(),getWidth()/2 - nameImages.getIconWidth()/2,70,nameImages.getIconWidth(),nameImages.getIconHeight(),this);
+        g.drawImage(new ImageIcon(getClass().getResource("/Images/name.png")).getImage(),getWidth()/2-200,getHeight()/2-40,300,30,null);
     }
 
     private void textField() {

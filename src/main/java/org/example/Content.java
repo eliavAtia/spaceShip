@@ -37,9 +37,10 @@ public class Content extends JPanel implements KeyListener {
     private String playerName;
     private Leaderboard leaderboard;
     private boolean isSaved;
-    private boolean boss1Defeated;
+    private boolean bossActive;
     private int difficultyLevel=1;
     private Random random;
+
 
 
 
@@ -155,6 +156,7 @@ public class Content extends JPanel implements KeyListener {
         frame.setContentPane(menu);
         menu.returnToPreviousPanel(); // מכין מחדש את הכפתורים והמצב
         backGroundSound.stop();
+        bossTheme.stop();
         frame.revalidate();
         frame.repaint();
         menu.requestFocusInWindow();
@@ -362,19 +364,23 @@ public class Content extends JPanel implements KeyListener {
             }
         }
         meteors.removeAll(meteorsToRemove);
-        if (now - lastMeteorSpawnTime >= METEOR_SPAWN_DELAY) {
+        if ((now - lastMeteorSpawnTime >= METEOR_SPAWN_DELAY)&&!bossActive) {
             createNewMeteor();
             lastMeteorSpawnTime = now;
         }
     }
 
     private void updateEnemySpaceShips(){
+        int getToY=70;
+        if (bossActive){
+            getToY=140;
+        }
         ArrayList<EnemySpaceShip> toRemove = new ArrayList<>();
         for (EnemySpaceShip enemySpaceShip : enemySpaceShips) {
             if (enemySpaceShip.getY() > getHeight()) {
                 toRemove.add(enemySpaceShip);
             } else {
-                if(enemySpaceShip.getY()<=70){
+                if(enemySpaceShip.getY()<=getToY){
                     enemySpaceShip.moveDown();
                 }
                 else {
@@ -411,7 +417,7 @@ public class Content extends JPanel implements KeyListener {
     //collisions
     private List<Mob> checkPlayerCollision(List<Mob> mobs){
         ArrayList<Mob> mobsToRemove = new ArrayList<>();
-        if(player.isShieldOn()) return mobsToRemove;
+        if(player.isShieldOn()||player.isBoostShieldOn()) return mobsToRemove;
         Rectangle playerRectangle=new Rectangle(
                 player.getX()+20,
                 player.getY()+20,
@@ -579,7 +585,7 @@ public class Content extends JPanel implements KeyListener {
                         newBullets.removeAll(checkPlayerCollision(new ArrayList<Mob>(newBullets)));
                         enemySpaceShip.setEnemyBullets(newBullets);
                     }
-                    if (score > enemyRespawn[0]) {
+                    if (score > enemyRespawn[0]&&!bossActive) {
                         int num = random.nextInt(getWidth());
                         for (int i = 0; i < difficultyLevel; i++) {
                             enemySpaceShips.add(new EnemySpaceShip(num,-15));
@@ -610,15 +616,19 @@ public class Content extends JPanel implements KeyListener {
     }
 
     private void bossActivation() {
-        final int[] bossRespawn = {10000};
+        final int[] bossRespawn = {80000,new Boss(difficultyLevel,1, getWidth(), getHeight()).getLife()-50};
         new Thread(() -> {
             while (!isGameOver) {
                 while (score > bossRespawn[0]) {
-                    bossRespawn[0] += 10000;
+                    bossRespawn[0] += 80000;
                     if (bosses.isEmpty()) {
                         backGroundSound.pause();
                         bossTheme.playLoop();
-                        bosses.add(new Boss(1, getWidth(), getHeight()));
+                        bosses.add(new Boss(difficultyLevel,1, getWidth(), getHeight()));
+                        bossActive=true;
+                        meteors.clear();
+                        enemySpaceShips.clear();
+                        bossRespawn[1]=bosses.getFirst().getLife()-50;
                         break;
                     }
                 }
@@ -626,10 +636,20 @@ public class Content extends JPanel implements KeyListener {
                     Boss boss = bosses.getFirst();
                     boss.moveSideways(player);
                     boss.updateBullets();
-                    meteors.clear();
-                    enemySpaceShips.clear();
                     bosses.removeAll(checkBulletsCollision(new ArrayList<>(bosses), 1000, 2));
                     boss.getBullets().removeAll(checkPlayerCollision(new ArrayList<>(boss.getBullets())));
+                    if(boss.getLife()<bossRespawn[1]){
+                        bossRespawn[1]-=100;
+                        int num = random.nextInt(getWidth());
+                        for (int i = 0; i < difficultyLevel/2+1; i++) {
+                            enemySpaceShips.add(new EnemySpaceShip(num,-15));
+                            int num2 = random.nextInt(getWidth());
+                            while (Math.abs(num-num2)<player.getWidth()+15){
+                                num2 = random.nextInt(getWidth());
+                            }
+                            num = num2;
+                        }
+                    }
                     if (boss.getLife() <= 0) {
                         int bossX = boss.getX();
                         int bossY = boss.getY();
@@ -637,10 +657,10 @@ public class Content extends JPanel implements KeyListener {
                         int maxX = bossX + boss.getWidth();
                         boosts.add(new Boost(random.nextInt(minX, maxX), bossY, 1, player));
                         boosts.add(new Boost(random.nextInt(minX, maxX), bossY, 2, player));
-                        boosts.add(new Boost(random.nextInt(minX, maxX), bossY, 3, player));
                         bosses.clear();
                         bossTheme.stop();
                         backGroundSound.resume();
+                        bossActive=false;
                     }
                 }
                 try {

@@ -24,7 +24,7 @@ public class Player  {
     private int bulletDamage;
     private int XP;
     private boolean[] boostsThatAreOn;
-
+    private boolean boostShieldOn;
 
     public Player(int x,int y,int width,int height){
         this.x=x;
@@ -231,4 +231,11 @@ public class Player  {
         this.boostsThatAreOn = boostsThatAreOn;
     }
 
+    public boolean isBoostShieldOn() {
+        return boostShieldOn;
+    }
+
+    public void setBoostShieldOn(boolean boostShieldOn) {
+        this.boostShieldOn = boostShieldOn;
+    }
 }

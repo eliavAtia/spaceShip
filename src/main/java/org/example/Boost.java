@@ -14,6 +14,7 @@ public class Boost{
     private int type;
     private Image image;
     private Player player;
+    private long effectCooldown;
 
 
     public Boost(int x,int y,int type,Player player){
@@ -39,14 +40,21 @@ public class Boost{
             case 2: player.setBulletHeight(player.getBulletHeight()*2);
                     player.setBulletWidth(player.getBulletWidth()*2);
                     player.setBulletDamage(player.getBulletDamage()*2);
-                    whatsOn[1]=true;break;
-            case 3: player.setShieldOn(true);whatsOn[2]=true;break;
-            case 4: player.setXP(player.getXP()*2);whatsOn[3]=true;break;
+                    whatsOn[1]=true;
+                    effectCooldown=10000;
+                    break;
+            case 3: player.setBoostShieldOn(true);whatsOn[2]=true;
+                    effectCooldown=3000;
+                    break;
+            case 4: player.setXP(player.getXP()*2);
+                    whatsOn[3]=true;
+                    effectCooldown=15000;
+                    break;
         }
         player.setBoostsThatAreOn(whatsOn);
         new Thread(()->{
             try{
-                Thread.sleep(7000);
+                Thread.sleep(effectCooldown);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -55,7 +63,7 @@ public class Boost{
                     player.setBulletWidth(player.getBulletWidth()/2);
                     player.setBulletDamage(player.getBulletDamage()/2);
                     whatsOn[1]=false;break;
-                case 3: player.setShieldOn(false);whatsOn[2]=false;break;
+                case 3: player.setBoostShieldOn(false);whatsOn[2]=false;break;
                 case 4: player.setXP(player.getXP()/2);whatsOn[3]=false;break;
             }
         }).start();
