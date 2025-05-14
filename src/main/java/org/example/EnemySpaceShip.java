@@ -17,6 +17,7 @@ public class EnemySpaceShip extends Mob {
     public void setEnemyBullets(ArrayList<EnemyBullets> enemyBullets) {
         this.enemyBullets = enemyBullets;
     }
+    private ImageIcon bulletImage;
 
 
 
@@ -34,20 +35,21 @@ public class EnemySpaceShip extends Mob {
             System.out.println("שגיאה בטעינת התמונה: " + e.getMessage());
             setImage(null);
         }
+        bulletImage = new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/cow.png")));
     }
 
     public void updateBullets(){
         long currentTime = System.currentTimeMillis();
         ArrayList<EnemyBullets> toRemove = new ArrayList<>();
         for (EnemyBullets enemyBullet : enemyBullets){
-            enemyBullet.moveDown();
+            enemyBullet.moveDown(4);
             if (enemyBullet.getY() >= 1000){
                 toRemove.add(enemyBullet);
             }
         }
         enemyBullets.removeAll(toRemove);
         if (getY() > 70 && currentTime - lastShotTime >= SHOOT_SPAWN_DELAY){
-            enemyBullets.add(new EnemyBullets(getX() , getY()+10));
+            enemyBullets.add(new EnemyBullets(getX() , getY()+getHeight()/2-20,60,60, bulletImage.getImage()));
             lastShotTime = currentTime;
         }
     }
@@ -61,6 +63,7 @@ public class EnemySpaceShip extends Mob {
         graphics.fillRect(getX() - getWidth()/2 , getY() - getHeight()/2+50, (int) ((double) getLife() / maxHp * getWidth()), 10);
         for (EnemyBullets enemyBullet : enemyBullets){
             enemyBullet.paint(graphics);
+
         }
     }
 
@@ -77,7 +80,7 @@ public class EnemySpaceShip extends Mob {
             }
         } else {
             setX(getX()-1);;
-            if (getX() <= 0) {
+            if (getX() <= 100) {
                 movingRight = true;
                 setY(getY()+100);
             }

@@ -7,24 +7,18 @@ import java.util.Objects;
 
 public class EnemyBullets extends Mob {
 
-    public EnemyBullets(int x, int y) {
+    public EnemyBullets(int x, int y,int width,int height, Image image) {
         setX(x);
         setY(y);
-        setWidth(60);
-        setHeight(60);
+        setWidth(width);
+        setHeight(height);
+        setImage(image);
         setLife(1);
-        try {
-            ImageIcon imageIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/cow.png")));
-            setImage(imageIcon.getImage());
-        } catch (Exception e) {
-            System.out.println("שגיאה בטעינת התמונה: " + e.getMessage());
-            setImage(null);
-        }
     }
 
     public void paint(Graphics graphics) {
         if (getImage() != null) {
-            graphics.drawImage(getImage(), getX(), getY(), getWidth(), getHeight(), null);
+            graphics.drawImage(getImage(), getX()-getWidth()/2, getY()-getHeight()/2, getWidth(), getHeight(), null);
         } else {
             graphics.setColor(Color.RED);
             graphics.fillRect(getX(), getY(), getWidth(), getHeight());
@@ -33,8 +27,8 @@ public class EnemyBullets extends Mob {
         }
     }
 
-    public void moveDown(){
-        setY(getY()+4);
+    public void moveDown(int speed){
+        setY(getY()+speed);
     }
 
 }

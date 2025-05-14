@@ -17,7 +17,7 @@ public class Content extends JPanel implements KeyListener {
     private Image background, gameOver, heartFull, heartEmpty;
     private ImageIcon pauseButtonImage, goBackImage;
     private boolean isGameOver, isPaused;
-    private SoundPlayer gameOverSound, backGroundSound;
+    private SoundPlayer gameOverSound, backGroundSound, bossTheme;
     private int score;
     private Player player;
     private List<Meteor> meteors;
@@ -37,7 +37,7 @@ public class Content extends JPanel implements KeyListener {
     private String playerName;
     private Leaderboard leaderboard;
     private boolean isSaved;
-    private boolean boss1Defeated,boss3Defeated,boss2Defeated, bossActivated;
+    private boolean boss1Defeated;
 
 
 
@@ -72,6 +72,7 @@ public class Content extends JPanel implements KeyListener {
         this.pauseButtonImage = new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/pause button.png")));
         this.goBackImage = new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/goBack.png")));
         this.backGroundSound = new SoundPlayer("/Sounds/starsWarsTheme.wav");
+        this.bossTheme = new SoundPlayer("/Sounds/Star Wars- The Imperial March (Darth Vader's Theme).wav");
     }
 
     private void mobBuilder(){
@@ -211,11 +212,6 @@ public class Content extends JPanel implements KeyListener {
         }
         for (Boss boss : bosses) {
             boss.draw(g);
-            boss.moveSideways(player);
-            if (boss.getY() > 100) {
-                boss.shoot();
-                boss.updateBullets();
-            }
         }
         for (EnemySpaceShip enemySpaceShip : enemySpaceShips) {
             enemySpaceShip.paint(g);
@@ -410,6 +406,7 @@ public class Content extends JPanel implements KeyListener {
     //collisions
     private List<Mob> checkPlayerCollision(List<Mob> mobs){
         ArrayList<Mob> mobsToRemove = new ArrayList<>();
+        if(player.isShieldOn()) return mobsToRemove;
         Rectangle playerRectangle=new Rectangle(
                 player.getX()+20,
                 player.getY()+20,
@@ -423,33 +420,32 @@ public class Content extends JPanel implements KeyListener {
                     mob.getWidth(),
                     mob.getHeight()
             );
-            if (player.isShieldOn()){
-                continue;
-            }
-            if (mobRectangle.intersects(playerRectangle)){
+            if (mobRectangle.intersects(playerRectangle)) {
                 player.setShieldOn(true);
-                player.setHp(player.getHp()-1);
-                explosions.add(new Explosion(mob.getX(),mob.getY()));
+                player.setHp(player.getHp() - 1);
+                explosions.add(new Explosion(mob.getX(), mob.getY()));
                 mobsToRemove.add(mob);
-            }
-            if (player.getHp()<=0){
-                this.isGameOver=true;
-                gameOverSound.playSound();
-                if (!isSaved){
-                    this.leaderboard.addScore(this.playerName,this.score);
-                    isSaved=true;
-                }
-            }
-            new Thread(()->{
-                try{
-                    if (player.isShieldOn()){
-                        Thread.sleep(3000);
-                        player.setShieldOn(false);
+                if (player.getHp() <= 0) {
+                    this.isGameOver = true;
+                    gameOverSound.playSound();
+                    if (!isSaved) {
+                        this.leaderboard.addScore(this.playerName, this.score);
+                        isSaved = true;
                     }
-                }catch (InterruptedException e){
-                    e.printStackTrace();
                 }
-            }).start();
+                new Thread(() -> {
+                    try {
+                        if (player.isShieldOn()) {
+                            Thread.sleep(3000);
+                            player.setShieldOn(false);
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
+                break;
+            }
+
         }
         return mobsToRemove;
     }
@@ -602,16 +598,22 @@ public class Content extends JPanel implements KeyListener {
     private void bossActivation(){
         new Thread(()-> {
             while (!isGameOver) {
-                if (score > 400 && !boss1Defeated) {
+                if (score > 200 && !boss1Defeated) {
                     if(bosses.isEmpty()){
-                        bosses.add(new Boss(1,getWidth()));
+                        backGroundSound.pause();
+                        bossTheme.playLoop();
+                        bosses.add(new Boss(1,getWidth(),getHeight()));
                     }
+                    bosses.getFirst().moveSideways(player);
+                    bosses.getFirst().updateBullets();
                     meteors.removeAll(meteors);
                     enemySpaceShips.removeAll(enemySpaceShips);
                     this.bosses.removeAll(checkBulletsCollision(new ArrayList<Mob>(bosses),1000,2));
                     this.bosses.getFirst().getBullets().removeAll(checkPlayerCollision(new ArrayList<Mob>(this.bosses.getFirst().getBullets())));
                     if(bosses.getFirst().getLife()<=0){
                         boss1Defeated=true;
+                        bossTheme.stop();
+                        backGroundSound.resume();
                     }
                 }
                 try {
