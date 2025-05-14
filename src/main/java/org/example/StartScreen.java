@@ -9,7 +9,6 @@ import java.util.Objects;
 public class StartScreen extends JPanel {
     private JButton StartButton, instructionsButton, leaderboardButton, okButton;
     private JTextField enterName;
-    private String playerName;
     private JPanel contentPanel;
     private Content game;
     private SoundPlayer backGroundMusic;
@@ -18,7 +17,7 @@ public class StartScreen extends JPanel {
     private final ImageIcon startButtonImage = new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/Start_game_photo-removebg-preview.png")));
     private final ImageIcon instructionsButtonImage = new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/instruction-removebg-preview.png")));
     private final ImageIcon leaderboardButtonImage = new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/__LEADERBOARDS_-_עותק-removebg-preview.png")));
-    private final ImageIcon nameImages = new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/Cool Text - space NIgga 482251320904050.png")));
+    private final ImageIcon nameImages = new ImageIcon(Objects.requireNonNull(getClass().getResource("/Images/cooltext482504470959714.png")));
     private final JFrame frame;
     private String currentPlayerName;// StartScreen
     private LeaderBoardsFrame leaderBoardsFrame;

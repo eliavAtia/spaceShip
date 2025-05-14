@@ -5,7 +5,7 @@ import java.util.Objects;
 
 public class Main {
     public static void main(String[] args) {
-        JFrame window = new JFrame("space nigga");
+        JFrame window = new JFrame("DriftZone");
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Dimension screenSize = toolkit.getScreenSize();
         window.setSize(screenSize.width, screenSize.height);
@@ -16,8 +16,8 @@ public class Main {
         ImageIcon icon = new ImageIcon(Objects.requireNonNull(Main.class.getResource("/Images/sSpaceShip.png")));
         window.setIconImage(icon.getImage());
         window.setLayout(null);
-        window.setVisible(true);
         StartScreen startScreen = new StartScreen(window, 0, 0, screenSize.width, screenSize.height);
         window.setContentPane(startScreen);
+        window.setVisible(true);
     }
 }
