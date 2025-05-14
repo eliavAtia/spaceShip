@@ -23,35 +23,27 @@ public class StartScreen extends JPanel {
     private String currentPlayerName;// StartScreen
     private LeaderBoardsFrame leaderBoardsFrame;
     private Leaderboard leaderboard;
+    private boolean nameEntered = false;
 
     public StartScreen(JFrame frame, int x, int y, int Width, int High) {
         this.frame = frame;
         this.setBounds(x, y, Width, High);
         setLayout(null);
-
-        // רקע ומוזיקה
         backGroundBuilder();
-
-        // יצירת לוח ניקוד וטעינה מקובץ
         leaderboard = new Leaderboard();
         try {
-            leaderboard.loadFromFile(); // טוען ניקוד מקובץ (אם קיים)
+            leaderboard.loadFromFile();
         } catch (Exception e) {
             System.out.println("לא נטען לוח ניקוד - נתחיל חדש.");
         }
-
-        // בניית רכיבים גרפיים
         contentBuilder(Width, High);
         instructionsBuilder(Width, High);
         startButtonBuilder(Width, High);
-        leaderboardsBuilder(Width, High); // עכשיו יש לנו Leaderboard מאותחל
+        leaderboardsBuilder(Width, High);
         instructionsButtonBuilder(Width, High);
         leaderboardButtonBuilder(Width, High);
-
-        // הוספה למסך
         this.add(contentPanel);
         this.add(instructions);
-        // שדה טקסט להזנת שם שחקן
         textField();
     }
 
@@ -149,9 +141,26 @@ public class StartScreen extends JPanel {
     public void returnToPreviousPanel() {
         contentPanel.setVisible(true);
         instructions.setVisible(false);
+            if (nameEntered) {
+                // מציג רק את הכפתורים כי שם כבר הוזן
+                contentPanel.add(instructionsButton);
+                contentPanel.add(leaderboardButton);
+                contentPanel.add(StartButton);
+
+                if (enterName != null) enterName.setVisible(false);
+                if (okButton != null) okButton.setVisible(false);
+            } else {
+                // לא הוזן שם עדיין – מציג שדה טקסט
+                if (enterName != null) enterName.setVisible(true);
+                if (okButton != null) okButton.setVisible(true);
+            }
+        if (backGroundMusic != null && !backGroundMusic.isRunning()) {
+            backGroundMusic.playLoop();
+        }
         this.revalidate();
         this.repaint();
     }
+
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -161,6 +170,7 @@ public class StartScreen extends JPanel {
     }
 
     private void textField() {
+        if (nameEntered) return;
         enterName = new JTextField();
         enterName.setBounds(getWidth()/2 - 200, getHeight()/2, 300, 40);
         enterName.setFont(new Font("Aharoni", Font.PLAIN, 18));
@@ -176,7 +186,7 @@ public class StartScreen extends JPanel {
                 JOptionPane.showMessageDialog(this, "אנא הכנס שם לפני התחלה");
             } else {
                 currentPlayerName = name.trim(); // StartScreen
-
+                nameEntered = true;
                 try {
                     FileWriter writer = new FileWriter("names.txt", true); // true = append mode
                     writer.write(name.trim() + "\n");

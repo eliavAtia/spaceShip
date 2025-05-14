@@ -47,6 +47,9 @@ public class Content extends JPanel implements KeyListener {
         this.playerName=playerName;
         imageSoundBuilder();
         this.frame = frame;
+
+        this.menu = parentPanel;
+
         setFocusable(true);
         requestFocusInWindow();
         addKeyListener(this);
@@ -126,9 +129,18 @@ public class Content extends JPanel implements KeyListener {
         this.pauseButton.addActionListener((e) -> pauseButtonAction());
     }
 
+    private void goBackToMenuAction(){
+        frame.setContentPane(menu);
+        menu.returnToPreviousPanel(); // מכין מחדש את הכפתורים והמצב
+        backGroundSound.stop();
+        frame.revalidate();
+        frame.repaint();
+        menu.requestFocusInWindow();
+    }
 
 
     //buttons actions
+
     private void pauseButtonAction(){
         this.isPaused = !isPaused;
         if (!isPaused) {
@@ -143,16 +155,6 @@ public class Content extends JPanel implements KeyListener {
                 action();
             }
         }
-    }
-
-    private void goBackToMenuAction(){
-        this.menu = new StartScreen(this.frame,0, 0, frame.getWidth(), frame.getHeight());
-        frame.setContentPane(menu);
-        frame.setResizable(true);
-        frame.revalidate();
-        frame.repaint();
-        menu.requestFocusInWindow();
-        backGroundSound.stop();
     }
 
 

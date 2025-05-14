@@ -19,7 +19,7 @@ public class Instructions extends JPanel {
         exitIcon.setImage(exitIcon.getImage().getScaledInstance(50,30,Image.SCALE_SMOOTH));
 
         JButton close = new JButton(exitIcon);
-        close.setBounds(getWidth()-(getWidth()/10)-30, getHeight()-(getHeight()/10)*9, 30, 20); // מיקום כפתור "סגור"
+        close.setBounds(getWidth()-(getWidth()/10)-30, getHeight()-(getHeight()/10)*9+10, 30, 20); // מיקום כפתור "סגור"
         close.addActionListener((e) -> {
             parentPanel.returnToPreviousPanel();
             parentPanel.revalidate();
