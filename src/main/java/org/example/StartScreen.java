@@ -23,6 +23,7 @@ public class StartScreen extends JPanel {
     private LeaderBoardsFrame leaderBoardsFrame;
     private Leaderboard leaderboard;
     private boolean nameEntered = false;
+    private boolean hasEnteredName;
 
     public StartScreen(JFrame frame, int x, int y, int Width, int High) {
         this.frame = frame;
@@ -166,7 +167,9 @@ public class StartScreen extends JPanel {
         super.paintComponent(g);
         g.drawImage(Gif.getImage(), 0, 0, getWidth(), getHeight(), this);
         g.drawImage(nameImages.getImage(),getWidth()/2 - nameImages.getIconWidth()/2,70,nameImages.getIconWidth(),nameImages.getIconHeight(),this);
-        g.drawImage(new ImageIcon(getClass().getResource("/Images/name.png")).getImage(),getWidth()/2-200,getHeight()/2-40,300,30,null);
+        if (!hasEnteredName) {
+            g.drawImage(new ImageIcon(getClass().getResource("/Images/name.png")).getImage(), getWidth() / 2 - 200, getHeight() / 2 - 40, 300, 30, null);
+        }
     }
 
     private void textField() {
@@ -195,6 +198,7 @@ public class StartScreen extends JPanel {
                     ex.printStackTrace();
                     JOptionPane.showMessageDialog(this, "שגיאה בשמירת השם לקובץ.");
                 }
+                hasEnteredName=true;
                 enterName.setVisible(false);
                 okButton.setVisible(false);
                 this.contentPanel.add(instructionsButton);
