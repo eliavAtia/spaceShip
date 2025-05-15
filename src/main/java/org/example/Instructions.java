@@ -41,7 +41,7 @@ public class Instructions extends JPanel {
         add(textArea);
 
         String instrutionsText = """  
-                Welcome to the space shooter game! In this game, you control a spaceship and your goal is to
+                Welcome to the DriftZone game! In this game, you control a spaceship and your goal is to
                 survive and destroy all incoming threats in space.
           
                 You can move your spaceship using the W, A, S, and D keys – W to move up,
