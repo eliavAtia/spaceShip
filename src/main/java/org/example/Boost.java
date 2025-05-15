@@ -50,6 +50,9 @@ public class Boost{
                     whatsOn[3]=true;
                     effectCooldown=15000;
                     break;
+            case 5: whatsOn[4]=true;
+                    effectCooldown=7000;
+                    break;
         }
         player.setBoostsThatAreOn(whatsOn);
         new Thread(()->{
@@ -65,6 +68,7 @@ public class Boost{
                     whatsOn[1]=false;break;
                 case 3: player.setBoostShieldOn(false);whatsOn[2]=false;break;
                 case 4: player.setXP(player.getXP()/2);whatsOn[3]=false;break;
+                case 5: whatsOn[4]=false;break;
             }
         }).start();
         player.setBoostsThatAreOn(whatsOn);
@@ -77,6 +81,7 @@ public class Boost{
             case 2:this.image=new ImageIcon(getClass().getResource("/Images/sword.png")).getImage();break;
             case 3: this.image=new ImageIcon(getClass().getResource("/Images/shield.png")).getImage();break;
             case 4: this.image=new ImageIcon(getClass().getResource("/Images/xpIcon.png")).getImage();break;
+            case 5: this.image=new ImageIcon(getClass().getResource("/Images/speedBoost.png")).getImage();break;
         }
     }
 

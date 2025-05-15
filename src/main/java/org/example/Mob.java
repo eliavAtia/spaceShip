@@ -85,4 +85,7 @@ public class Mob {
         startFlashingEffect();
     }
 
+    public void setGotHit(boolean gotHit) {
+        this.gotHit = gotHit;
+    }
 }

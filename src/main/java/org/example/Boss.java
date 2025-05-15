@@ -30,6 +30,11 @@ public class Boss extends  Mob {
         setByType();
     }
 
+    @Override
+    public void mobHit(int damage) {
+        setLife(getLife()-damage);
+        setGotHit(true);
+    }
 
     private void setByType(){
         switch (this.type){

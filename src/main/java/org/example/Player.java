@@ -19,12 +19,13 @@ public class Player  {
     private boolean shieldOn;
     private boolean shouldDrawPlayerImage = true;
     private List<Bullet> bullets;
-    private long lastBulletSpawnTime = 0,BULLET_SPAWN_DELAY = 300;
+    private long lastBulletSpawnTime = 0,BULLET_SPAWN_DELAY;
     private int bulletWidth,bulletHeight;
     private int bulletDamage;
     private int XP;
     private boolean[] boostsThatAreOn;
     private boolean boostShieldOn;
+    private int RbullletX,Lbulletx,bulletY;
 
     public Player(int x,int y,int width,int height){
         this.x=x;
@@ -41,7 +42,7 @@ public class Player  {
         this.bulletHeight=60;
         this.bulletDamage=1;
         this.XP=1;
-        this.boostsThatAreOn=new boolean[4];
+        this.boostsThatAreOn=new boolean[5];
     }
 
     public void paint(Graphics graphics){
@@ -62,7 +63,7 @@ public class Player  {
 
     public void startFlashingEffect() {
         new Thread(() -> {
-            while (shieldOn) {
+            while (shieldOn||boostShieldOn) {
                 shouldDrawPlayerImage = !shouldDrawPlayerImage;
                 try {
                     Thread.sleep(200);
@@ -112,14 +113,30 @@ public class Player  {
     }
 
     public Bullet shootRight(){
+        if (!boostsThatAreOn[1]){
+            this.RbullletX=x+width-45;
+            this.bulletY=y;
+        }
+        else {
+            this.RbullletX=x+width-67;
+            this.bulletY=y-25;
+        }
         lasers.playSound();
-        return new Bullet(x+width -45,y,bulletWidth,bulletHeight,this.bulletDamage);
+        return new Bullet(RbullletX,bulletY,bulletWidth,bulletHeight,this.bulletDamage);
 
     }
 
     public Bullet shootLeft(){
+        if(!boostsThatAreOn[1]){
+            this.Lbulletx=x+3;
+            this.bulletY=y;
+        }
+        else {
+            this.Lbulletx=x-19;
+            this.bulletY=y-25;
+        }
         lasers.playSound();
-        return new Bullet(x+3,y,bulletWidth,bulletHeight,this.bulletDamage);
+        return new Bullet(Lbulletx,bulletY,bulletWidth,bulletHeight,this.bulletDamage);
     }
 
     public int getHp(){
@@ -149,6 +166,12 @@ public class Player  {
     }
 
     public void updateBullets(){
+        if (boostsThatAreOn[4]){
+            BULLET_SPAWN_DELAY=200;
+        }
+        else {
+            BULLET_SPAWN_DELAY=300;
+        }
         long now = System.currentTimeMillis();
         ArrayList<Bullet> bulletsToRemove = new ArrayList<>();
         for (Bullet b:bullets) {
@@ -237,5 +260,34 @@ public class Player  {
 
     public void setBoostShieldOn(boolean boostShieldOn) {
         this.boostShieldOn = boostShieldOn;
+        if (boostShieldOn) {
+            startFlashingEffect();
+        } else {
+            shouldDrawPlayerImage = true;
+        }
+    }
+
+    public int getBulletY() {
+        return bulletY;
+    }
+
+    public void setBulletY(int bulletY) {
+        this.bulletY = bulletY;
+    }
+
+    public int getRbullletX() {
+        return RbullletX;
+    }
+
+    public void setRbullletX(int rbullletX) {
+        RbullletX = rbullletX;
+    }
+
+    public int getLbulletx() {
+        return Lbulletx;
+    }
+
+    public void setLbulletx(int lbulletx) {
+        Lbulletx = lbulletx;
     }
 }

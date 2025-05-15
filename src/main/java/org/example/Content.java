@@ -26,7 +26,7 @@ public class Content extends JPanel implements KeyListener {
     private List<Boss> bosses;
     private long lastMeteorSpawnTime = 0;
     private boolean rightPressed,leftPressed,upPressed,downPressed,spacePressed;
-    private static final long METEOR_SPAWN_DELAY = 1500;
+    private long METEOR_SPAWN_DELAY = 1500;
     private JLabel scoreLabel;
     private static Font customFont;
     private JButton goBackToMenu, pauseButton;
@@ -351,6 +351,7 @@ public class Content extends JPanel implements KeyListener {
     }
 
     public void updateMeteors() {
+        METEOR_SPAWN_DELAY=1500-difficultyLevel*75;
         long now = System.currentTimeMillis();
         ArrayList<Meteor> meteorsToRemove = new ArrayList<>();
         for (Meteor meteor: this.meteors) {
@@ -486,7 +487,7 @@ public class Content extends JPanel implements KeyListener {
                         mobsToRemove.add(mob);
                         explosions.add(new Explosion(mob.getX(), mob.getY()));
                         if (num==1){
-                            int type=random.nextInt(1,5);
+                            int type=random.nextInt(1,6);
                             Boost boost=new Boost(mob.getX(),mob.getY(),type,player);
                             boolean exists = false;
                             for (Boost b : boosts) {
@@ -618,7 +619,7 @@ public class Content extends JPanel implements KeyListener {
         new Thread(() -> {
             while (!isGameOver) {
                 while (score > bossRespawn[0]) {
-                    bossRespawn[0] += 8000;
+                    bossRespawn[0] += 8000+2000*difficultyLevel/2;
                     if (bosses.isEmpty()) {
                         backGroundSound.pause();
                         bossTheme.playLoop();
