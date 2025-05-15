@@ -673,8 +673,8 @@ public class Content extends JPanel implements KeyListener {
     }
 
     private void updateLevel() {
-        if (difficultyLevel <= 5 && score>5000) {
-            difficultyLevel = score / 5000;
+        if (difficultyLevel <= 5 && score>10000) {
+            difficultyLevel = score / 10000;
         }
     }
 }
